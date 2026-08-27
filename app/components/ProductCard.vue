@@ -1,54 +1,57 @@
-<script setup lang="ts">
-import type { Product } from '~/type/product';
-
-
-defineProps<{
-  product: Product
-}>()
-</script>
-
 <template>
-  <div
-    class="group overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
-  >
-    <!-- Image -->
-    <div class="overflow-hidden">
+  <div class="w-full max-w-sm overflow-hidden rounded-xl bg-white shadow-lg">
+    <!-- Product Image -->
+    <div
+      class="h-56 w-full transform duration-200 ease-in-out cursor-pointer"
+      @mouseenter="isHovered = true"
+      @mouseleave="isHovered = false"
+    >
       <img
-        :src="product.image"
+        :src="isHovered ? product.hoverimg : product.image"
         :alt="product.name"
-        class="h-56 w-full object-cover transition duration-300 group-hover:scale-105"
+        class="h-full w-full object-cover transition-all duration-300"
       />
     </div>
 
-    <!-- Content -->
-    <div class="p-5">
-
-      <!-- Product Name -->
-      <h2 class="text-xl font-bold text-gray-800">
+    <!-- Product Information -->
+    <div class="p-4">
+      <h2 class="text-lg font-bold text-gray-800">
         {{ product.name }}
       </h2>
 
-      <!-- Description -->
-      <p class="mt-2 line-clamp-2 text-sm text-gray-500">
-        {{ product.description }}
+      <p class="mt-2 text-xl font-semibold text-gray-700">
+        ${{ product.price }}
       </p>
 
-      <!-- Bottom -->
-      <div class="mt-5 flex items-center justify-between">
-
-        <!-- Price -->
-        <span class="text-2xl font-bold text-blue-600">
-          ${{ product.price }}
-        </span>
-
-        <!-- Button -->
-        <button
-          class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
-        >
-          Buy Now
-        </button>
-
-      </div>
+      <p class="mt-2 text-sm text-gray-500">
+        {{ product.description }}
+      </p>
+    </div>
+    <!-- Buttons -->
+    <div class="mt-2 flex gap-2 p-3">
+      <!-- Add to Cart -->
+      <button
+        class="flex-1 rounded-xl border border-white/20 bg-blue-700/20 px-4 py-2 font-semibold text-blue-900 shadow-xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-blue-400/40 hover:shadow-blue-400/50"
+        @click="addToCart"
+      >
+        Add to Cart
+      </button>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import type { Product } from "~/type/product";
+
+const props = defineProps<{
+  product: Product;
+}>();
+
+const isHovered = ref(false);
+
+const addToCart = () => {
+  alert(`${props.product.name} added to cart!`);
+};
+
+</script>
