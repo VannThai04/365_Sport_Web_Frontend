@@ -2,7 +2,7 @@
   <div class="w-full max-w-sm overflow-hidden rounded-xl bg-white shadow-lg">
     <!-- Product Image -->
     <div
-      class="h-56 w-full transform duration-200 ease-in-out cursor-pointer"
+      class="h-56 w-full transform duration-200 ease-in-out cursor-grab"
       @mouseenter="isHovered = true"
       @mouseleave="isHovered = false"
     >
@@ -31,7 +31,7 @@
     <div class="mt-2 flex gap-2 p-3">
       <!-- Add to Cart -->
       <button
-        class="flex-1 rounded-xl border border-white/20 bg-blue-700/20 px-4 py-2 font-semibold text-blue-900 shadow-xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-blue-400/40 hover:shadow-blue-400/50"
+        class="flex-1 cursor-pointer rounded-xl border border-white/20 bg-blue-700/20 px-4 py-2 font-semibold text-blue-900 shadow-xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-blue-400/40 hover:shadow-blue-400/50"
         @click="addToCart"
       >
         Add to Cart
@@ -53,5 +53,4 @@ const isHovered = ref(false);
 const addToCart = () => {
   alert(`${props.product.name} added to cart!`);
 };
-
 </script>
