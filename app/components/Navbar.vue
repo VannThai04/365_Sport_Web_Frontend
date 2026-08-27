@@ -25,6 +25,7 @@
             <NuxtLink
               to="/"
               class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               Home
             </NuxtLink>
@@ -34,6 +35,7 @@
             <NuxtLink
               to="/About"
               class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               About
             </NuxtLink>
@@ -43,6 +45,7 @@
             <NuxtLink
               to="/Product"
               class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               Product
             </NuxtLink>
@@ -52,6 +55,8 @@
             <NuxtLink
               to="/Contact"
               class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              active-class="bg-black text-white px-5 py-2 rounded-lg"
+
             >
               Contact
             </NuxtLink>
@@ -61,6 +66,7 @@
             <NuxtLink
               to="/Order"
               class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               Order
             </NuxtLink>
