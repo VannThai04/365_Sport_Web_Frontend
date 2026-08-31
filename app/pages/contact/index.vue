@@ -1,3 +1,8 @@
+<script setup lang="ts"> 
+definePageMeta({
+    layout: "user"
+})
+</script>
 <template>
   <div class="min-h-screen bg-gray-100 px-6 py-12">
 
