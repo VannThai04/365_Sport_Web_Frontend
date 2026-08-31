@@ -10,11 +10,16 @@
           to="/"
           class="flex items-center"
         >
-          <img
-            class="w-16 sm:w-20 object-contain"
-            src="https://361sport.com/cdn/shop/files/361_logo-BLACK_cee7a490-836a-429f-b257-f2c209a0327a.png?v=1707293000&width=110"
-            alt="361 Sport"
-          />
+         <h1 class="flex items-baseline font-black italic leading-none">
+  <span class="text-5xl tracking-tighter text-lime-500">
+    365
+  </span>
+
+  <span class="ml-1 text-2xl tracking-tight text-black">
+    Sports
+  </span>
+</h1>
+         
         </NuxtLink>
 
 

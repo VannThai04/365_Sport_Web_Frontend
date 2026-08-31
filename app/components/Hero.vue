@@ -44,7 +44,11 @@
               {{ slide.description }}
             </p>
 
-            <button
+            
+            <NuxtLink
+            to="/Product"
+          >
+           <button
               class="mt-8 rounded-md bg-lime-400 px-7 py-3
                      font-bold uppercase text-black
                      transition duration-300
@@ -52,7 +56,7 @@
             >
               Shop Now
             </button>
-
+          </NuxtLink>
           </div>
         </div>
       </div>
