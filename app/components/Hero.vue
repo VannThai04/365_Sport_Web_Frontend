@@ -52,7 +52,8 @@
               class="mt-8 rounded-md bg-lime-400 px-7 py-3
                      font-bold uppercase text-black
                      transition duration-300
-                     hover:bg-lime-300 hover:scale-105"
+                     hover:bg-lime-300 hover:scale-105
+                     hover:cursor-pointer"
             >
               Shop Now
             </button>
