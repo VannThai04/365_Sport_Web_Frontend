@@ -450,3 +450,34 @@ export const products: Product[] = [
   },
 
 ];
+
+const categoryCards = [
+  {
+    name: "Football",
+    image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55"
+  },
+  {
+    name: "Running",
+    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5"
+  },
+  {
+    name: "Basketball",
+    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc"
+  },
+  {
+    name: "Training",
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48"
+  },
+  {
+    name: "Clothing",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"
+  },
+  {
+    name: "Accessories",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438"
+  }
+]
+
+const selectCategory = (category: string) => {
+  selectedCategory.value = category
+}
