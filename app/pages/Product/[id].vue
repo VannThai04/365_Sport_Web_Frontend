@@ -503,6 +503,6 @@ const handleBuyNow = () => {
 
   addToCart(product.value, quantity.value, selectedSize.value);
 
-  navigateTo("/Cart");
+  navigateTo("/Order");
 };
 </script>

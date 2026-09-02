@@ -313,6 +313,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { navigateTo } from "#app/composables/router";
 
 // ===============================================
 // Cart
@@ -393,6 +394,6 @@ const applyPromo = () => {
 // ===============================================
 
 const checkout = () => {
-  alert(`Checkout total: $${total.value.toFixed(2)}`);
+  navigateTo("/Order");
 };
 </script>
