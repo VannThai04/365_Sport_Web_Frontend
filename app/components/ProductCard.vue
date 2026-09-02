@@ -143,7 +143,7 @@
           @click="goToProductDetail"
           class="flex-1 rounded-xl bg-black px-4 py-3 font-semibold text-white transition duration-300 hover:-translate-y-1 hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
-          🛒 Add to Cart
+          🔍 View Details
         </button>
 
         <!-- Buy -->
