@@ -45,7 +45,7 @@
         : product.image
     "
     :alt="product.name"
-    class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+    class="h-full w-full object-cover transition duration-500 group-hover:scale-105 cursor-grab active:cursor-grabbing"
   />
 </NuxtLink>
 
@@ -141,7 +141,7 @@
         <button
           :disabled="product.stock === 0"
           @click="addToCart"
-          class="flex-1 rounded-xl bg-black px-4 py-3 font-semibold text-white transition duration-300 hover:-translate-y-1 hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+          class="flex-1 rounded-xl bg-black px-4 py-3 font-semibold text-white transition duration-300 hover:-translate-y-1 hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300 active:scale-95 cursor-pointer"
         >
           🛒 Add to Cart
         </button>
@@ -150,7 +150,7 @@
         <button
           :disabled="product.stock === 0"
           @click="buyNow"
-          class="rounded-xl border border-gray-200 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+          class="rounded-xl border border-gray-200 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 active:scale-95 cursor-pointer"
         >
           Buy
         </button>
