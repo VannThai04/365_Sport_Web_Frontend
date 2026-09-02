@@ -12,12 +12,19 @@ definePageMeta({
 // =====================================================
 
 const search = ref("");
+const route = useRoute();
 
 // =====================================================
 // FILTERS
 // =====================================================
 
-const selectedType = ref("All");
+const selectedType = ref(
+  route.query.type === "popular"
+    ? "Popular"
+    : route.query.type === "discount"
+      ? "Discount"
+      : "All",
+);
 const selectedCategory = ref("All");
 const selectedBrand = ref("All");
 const selectedGender = ref("All");
@@ -59,7 +66,7 @@ const filteredProducts = computed(() => {
 
     const matchType =
       selectedType.value === "All" ||
-      (selectedType.value === "Popular" && product.stock <= 10) ||
+      (selectedType.value === "Popular" && product.popular === true) ||
       (selectedType.value === "Discount" && product.discount > 0);
 
     // CATEGORY
