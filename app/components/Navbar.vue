@@ -1,134 +1,230 @@
+<script setup lang="ts">
+
+// ===============================================
+// Wishlist
+// ===============================================
+
+const {
+  wishlistCount
+} = useWishlist();
+
+
+// ===============================================
+// Cart
+// ===============================================
+
+const {
+  cartCount
+} = useCart();
+
+</script>
+
+
 <template>
-  <header class="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
 
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <header
+    class="sticky top-0 z-50 w-full border-b border-gray-200 bg-white"
+  >
 
-      <div class="h-20 flex items-center justify-between gap-4 sm:gap-6 lg:gap-8">
+    <nav
+      class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+    >
 
+      <div
+        class="flex h-20 items-center justify-between gap-4 sm:gap-6 lg:gap-8"
+      >
+
+        <!-- ===================================== -->
         <!-- Logo -->
+        <!-- ===================================== -->
+
         <NuxtLink
           to="/"
           class="flex items-center"
         >
-         <h1 class="flex items-baseline font-black italic leading-none">
-  <span class="text-5xl tracking-tighter text-lime-500">
-    365
-  </span>
 
-  <span class="ml-1 text-2xl tracking-tight text-black">
-    Sports
-  </span>
-</h1>
-         
+          <h1
+            class="flex items-baseline font-black italic leading-none"
+          >
+
+            <span
+              class="text-5xl tracking-tighter text-lime-500"
+            >
+              365
+            </span>
+
+            <span
+              class="ml-1 text-2xl tracking-tight text-black"
+            >
+              Sports
+            </span>
+
+          </h1>
+
         </NuxtLink>
 
 
+        <!-- ===================================== -->
         <!-- Desktop Menu -->
-        <ul class="hidden md:flex items-center gap-8 lg:gap-10">
+        <!-- ===================================== -->
+
+        <ul
+          class="hidden items-center gap-8 md:flex lg:gap-10"
+        >
+
+          <!-- Home -->
 
           <li>
+
             <NuxtLink
               to="/"
-              class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              class="font-medium text-gray-800 transition duration-300 hover:text-amber-500"
               active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               Home
             </NuxtLink>
+
           </li>
 
-           <li>
+
+          <!-- Product -->
+
+          <li>
+
             <NuxtLink
               to="/Product"
-              class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              class="font-medium text-gray-800 transition duration-300 hover:text-amber-500"
               active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               Product
             </NuxtLink>
+
           </li>
+
+
+          <!-- About -->
+
           <li>
+
             <NuxtLink
               to="/About"
-              class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              class="font-medium text-gray-800 transition duration-300 hover:text-amber-500"
               active-class="bg-black text-white px-5 py-2 rounded-lg"
             >
               About
             </NuxtLink>
+
           </li>
 
-         
+
+          <!-- Contact -->
 
           <li>
+
             <NuxtLink
               to="/Contact"
-              class="text-gray-800 font-medium hover:text-amber-500 transition duration-300"
+              class="font-medium text-gray-800 transition duration-300 hover:text-amber-500"
               active-class="bg-black text-white px-5 py-2 rounded-lg"
-
             >
               Contact
             </NuxtLink>
-          </li>
 
+          </li>
 
         </ul>
 
 
+        <!-- ===================================== -->
         <!-- Right Icons -->
-        <div class="hidden sm:flex items-center gap-5">
+        <!-- ===================================== -->
 
+        <div
+          class="hidden items-center gap-5 sm:flex"
+        >
+
+          <!-- ================================= -->
           <!-- Search -->
+          <!-- ================================= -->
+
           <button
             class="group"
             title="Search"
           >
+
             <img
-              class="w-6 h-6 group-hover:scale-110 transition duration-300"
+              class="h-6 w-6 transition duration-300 group-hover:scale-110"
               src="https://img.icons8.com/?size=100&id=132&format=png&color=000000"
               alt="Search"
             />
+
           </button>
 
+
+          <!-- ================================= -->
           <!-- Wishlist -->
+          <!-- ================================= -->
+
           <NuxtLink
             to="/Wishlist"
-            class="relative group"
+            class="group relative flex items-center justify-center"
             title="Wishlist"
           >
+
             <img
-              class="w-6 h-6 group-hover:scale-110 transition duration-300"
-              src="https://img.icons8.com/?size=100&id=gAcJyxthDPeZ&format=png&color=000000"
+              class="h-6 w-6 transition duration-300 group-hover:scale-110"
+              src="https://img.icons8.com/?size=100&id=glkpNAGhoITn&format=png&color=000000"
               alt="Wishlist"
             />
 
+
+            <!-- Wishlist Count -->
+
             <span
-              class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center"
+              v-if="wishlistCount > 0"
+              class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white"
             >
-              2
+              {{ wishlistCount }}
             </span>
+
           </NuxtLink>
 
+
+          <!-- ================================= -->
           <!-- Cart -->
+          <!-- ================================= -->
+
           <NuxtLink
             to="/Cart"
-            class="relative group"
+            class="group relative"
             title="Cart"
           >
+
             <img
-              class="w-6 h-6 group-hover:scale-110 transition duration-300"
+              class="h-6 w-6 transition duration-300 group-hover:scale-110"
               src="https://img.icons8.com/?size=100&id=9671&format=png&color=000000"
               alt="Cart"
             />
 
+
+            <!-- Cart Count -->
+
             <span
-              class="absolute -top-2 -right-2 bg-amber-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center"
+              v-if="cartCount > 0"
+              class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-xs font-bold text-white"
             >
-              3
+              {{ cartCount }}
             </span>
+
           </NuxtLink>
 
+
+          <!-- ================================= -->
           <!-- Login -->
+          <!-- ================================= -->
+
           <NuxtLink
             to="/Auth/Login"
-            class="bg-black text-white px-5 py-2 rounded-lg font-medium hover:bg-amber-500 hover:text-black transition duration-300"
+            class="rounded-lg bg-black px-5 py-2 font-medium text-white transition duration-300 hover:bg-amber-500 hover:text-black"
           >
             Login
           </NuxtLink>
@@ -136,24 +232,31 @@
         </div>
 
 
+        <!-- ===================================== -->
         <!-- Mobile Menu Button -->
+        <!-- ===================================== -->
+
         <button
-          class="md:hidden p-2 rounded-lg hover:bg-gray-100"
+          class="rounded-lg p-2 hover:bg-gray-100 md:hidden"
         >
+
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-7 h-7"
+            class="h-7 w-7"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
             stroke-width="2"
           >
+
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M4 6h16M4 12h16M4 18h16"
             />
+
           </svg>
+
         </button>
 
       </div>
@@ -161,4 +264,5 @@
     </nav>
 
   </header>
+
 </template>
