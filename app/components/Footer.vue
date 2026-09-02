@@ -7,9 +7,15 @@
 
         <!-- Brand -->
         <div class="lg:col-span-1">
-          <h2 class="text-3xl font-black italic">
-            <span class="text-lime-400">365</span>SPORT
-          </h2>
+          <h1 class="flex items-baseline font-black italic leading-none">
+  <span class="text-5xl tracking-tighter text-lime-500">
+    365
+  </span>
+
+  <span class="ml-1 text-2xl tracking-tight text-white">
+    Sports
+  </span>
+</h1>
 
           <p class="mt-5 max-w-xs text-sm leading-6 text-gray-400">
             Your ultimate destination for premium sportswear,
