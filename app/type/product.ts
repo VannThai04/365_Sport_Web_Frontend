@@ -4,6 +4,7 @@ export interface Product {
   price: number;
   image: string;
   hoverimg: string;
+  images: string[];
   description: string;
 
   category: string;
@@ -19,4 +20,5 @@ export interface Product {
 
   featured: boolean;
   isNew: boolean;
+  popular?: boolean;
 }
