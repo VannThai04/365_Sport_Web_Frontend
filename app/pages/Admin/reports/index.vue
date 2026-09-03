@@ -1,150 +1,1161 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
+
 definePageMeta({
-  layout: "admin"
+  layout: "admin",
+});
+
+useHead({
+  title: "Reports & Analytics",
+});
+
+// =====================================================
+// DATE FILTER
+// =====================================================
+
+const selectedPeriod = ref("This Month");
+
+const periods = [
+  "Today",
+  "Yesterday",
+  "Last 7 Days",
+  "Last 30 Days",
+  "This Month",
+  "Last Month",
+  "This Year",
+  "Custom",
+];
+
+const fromDate = ref("2026-09-01");
+const toDate = ref("2026-09-03");
+
+const reportLoading = ref(false);
+
+// =====================================================
+// REPORT DATA
+// =====================================================
+
+const report = ref({
+  revenue: 24580,
+  previousRevenue: 20800,
+
+  orders: 281,
+  previousOrders: 245,
+
+  customers: 184,
+  previousCustomers: 160,
+
+  averageOrder: 87.5,
+  previousAverageOrder: 84.9,
+
+  productsSold: 412,
+
+  cancelledOrders: 14,
+
+  returnedOrders: 8,
+});
+
+// =====================================================
+// SALES DATA
+// =====================================================
+
+const salesData = [
+  {
+    month: "Jan",
+    revenue: 14500,
+    orders: 165,
+  },
+  {
+    month: "Feb",
+    revenue: 17200,
+    orders: 190,
+  },
+  {
+    month: "Mar",
+    revenue: 15800,
+    orders: 178,
+  },
+  {
+    month: "Apr",
+    revenue: 19400,
+    orders: 215,
+  },
+  {
+    month: "May",
+    revenue: 21100,
+    orders: 235,
+  },
+  {
+    month: "Jun",
+    revenue: 20300,
+    orders: 228,
+  },
+  {
+    month: "Jul",
+    revenue: 22600,
+    orders: 250,
+  },
+  {
+    month: "Aug",
+    revenue: 24100,
+    orders: 270,
+  },
+  {
+    month: "Sep",
+    revenue: 24580,
+    orders: 281,
+  },
+  {
+    month: "Oct",
+    revenue: 0,
+    orders: 0,
+  },
+  {
+    month: "Nov",
+    revenue: 0,
+    orders: 0,
+  },
+  {
+    month: "Dec",
+    revenue: 0,
+    orders: 0,
+  },
+];
+
+// =====================================================
+// TOP PRODUCTS
+// =====================================================
+
+const topProducts = [
+  {
+    name: "Mizuno Morelia Neo IV β JAPAN",
+    category: "Football Boots",
+    sold: 86,
+    revenue: 27434,
+  },
+  {
+    name: "Nike Mercurial Vapor 16 Elite",
+    category: "Football Boots",
+    sold: 72,
+    revenue: 21528,
+  },
+  {
+    name: "Adidas Predator Elite Firm Ground",
+    category: "Football Boots",
+    sold: 65,
+    revenue: 17550,
+  },
+  {
+    name: "PUMA FUTURE 8 ULTIMATE FG",
+    category: "Football Boots",
+    sold: 54,
+    revenue: 14580,
+  },
+  {
+    name: "Nike Phantom GX 2 Elite",
+    category: "Football Boots",
+    sold: 43,
+    revenue: 13330,
+  },
+];
+
+// =====================================================
+// TOP CUSTOMERS
+// =====================================================
+
+const topCustomers = [
+  {
+    name: "Dara Sok",
+    email: "dara@gmail.com",
+    orders: 18,
+    spent: 2450,
+  },
+  {
+    name: "Sovann Vann",
+    email: "sovann@gmail.com",
+    orders: 15,
+    spent: 2180,
+  },
+  {
+    name: "Chantha Kim",
+    email: "chantha@gmail.com",
+    orders: 13,
+    spent: 1950,
+  },
+  {
+    name: "Rithy Chea",
+    email: "rithy@gmail.com",
+    orders: 11,
+    spent: 1640,
+  },
+  {
+    name: "Vicheka Long",
+    email: "vicheka@gmail.com",
+    orders: 9,
+    spent: 1390,
+  },
+];
+
+// =====================================================
+// ORDER STATUS
+// =====================================================
+
+const orderStatuses = [
+  {
+    name: "Delivered",
+    count: 218,
+    percentage: 77.6,
+  },
+  {
+    name: "Processing",
+    count: 29,
+    percentage: 10.3,
+  },
+  {
+    name: "Pending",
+    count: 20,
+    percentage: 7.1,
+  },
+  {
+    name: "Cancelled",
+    count: 14,
+    percentage: 5,
+  },
+];
+
+// =====================================================
+// PAYMENT METHODS
+// =====================================================
+
+const paymentMethods = [
+  {
+    name: "Cash on Delivery",
+    orders: 126,
+    percentage: 44.8,
+  },
+  {
+    name: "ABA Pay",
+    orders: 74,
+    percentage: 26.3,
+  },
+  {
+    name: "ACLEDA",
+    orders: 43,
+    percentage: 15.3,
+  },
+  {
+    name: "Credit / Debit Card",
+    orders: 38,
+    percentage: 13.5,
+  },
+];
+
+// =====================================================
+// CALCULATIONS
+// =====================================================
+
+const revenueGrowth = computed(() => {
+  if (!report.value.previousRevenue) return 0;
+
+  return (
+    ((report.value.revenue - report.value.previousRevenue) /
+      report.value.previousRevenue) *
+    100
+  ).toFixed(1);
+});
+
+const ordersGrowth = computed(() => {
+  if (!report.value.previousOrders) return 0;
+
+  return (
+    ((report.value.orders - report.value.previousOrders) /
+      report.value.previousOrders) *
+    100
+  ).toFixed(1);
+});
+
+const customersGrowth = computed(() => {
+  if (!report.value.previousCustomers) return 0;
+
+  return (
+    ((report.value.customers - report.value.previousCustomers) /
+      report.value.previousCustomers) *
+    100
+  ).toFixed(1);
+});
+
+const averageOrderGrowth = computed(() => {
+  if (!report.value.previousAverageOrder) return 0;
+
+  return (
+    ((report.value.averageOrder -
+      report.value.previousAverageOrder) /
+      report.value.previousAverageOrder) *
+    100
+  ).toFixed(1);
+});
+
+const maxRevenue = computed(() => {
+  return Math.max(...salesData.map((item) => item.revenue), 1);
+});
+
+// =====================================================
+// FORMAT
+// =====================================================
+
+const formatPrice = (price: number) => {
+  return `$${price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+// =====================================================
+// PERIOD
+// =====================================================
+
+const changePeriod = () => {
+  if (selectedPeriod.value === "Today") {
+    fromDate.value = "2026-09-03";
+    toDate.value = "2026-09-03";
+  }
+
+  if (selectedPeriod.value === "Yesterday") {
+    fromDate.value = "2026-09-02";
+    toDate.value = "2026-09-02";
+  }
+
+  if (selectedPeriod.value === "Last 7 Days") {
+    fromDate.value = "2026-08-28";
+    toDate.value = "2026-09-03";
+  }
+
+  if (selectedPeriod.value === "Last 30 Days") {
+    fromDate.value = "2026-08-05";
+    toDate.value = "2026-09-03";
+  }
+
+  if (selectedPeriod.value === "This Month") {
+    fromDate.value = "2026-09-01";
+    toDate.value = "2026-09-03";
+  }
+
+  if (selectedPeriod.value === "Last Month") {
+    fromDate.value = "2026-08-01";
+    toDate.value = "2026-08-31";
+  }
+
+  if (selectedPeriod.value === "This Year") {
+    fromDate.value = "2026-01-01";
+    toDate.value = "2026-09-03";
+  }
+};
+
+// =====================================================
+// REFRESH
+// =====================================================
+
+const refreshReport = async () => {
+  reportLoading.value = true;
+
+  await new Promise((resolve) => setTimeout(resolve, 700));
+
+  reportLoading.value = false;
+};
+
+// =====================================================
+// PRINT
+// =====================================================
+
+const printReport = () => {
+  window.print();
+};
+
+// =====================================================
+// CSV EXPORT
+// =====================================================
+
+const exportCSV = () => {
+  const rows = [
+    ["365 Sport - Sales Report"],
+    [],
+    ["Report Period", selectedPeriod.value],
+    ["From", fromDate.value],
+    ["To", toDate.value],
+    [],
+    ["Metric", "Value"],
+    ["Revenue", report.value.revenue],
+    ["Orders", report.value.orders],
+    ["Customers", report.value.customers],
+    ["Average Order", report.value.averageOrder],
+    ["Products Sold", report.value.productsSold],
+    [],
+    ["Top Products"],
+    ["Product", "Category", "Sold", "Revenue"],
+    ...topProducts.map((product) => [
+      product.name,
+      product.category,
+      product.sold,
+      product.revenue,
+    ]),
+  ];
+
+  const csv = rows
+    .map((row) =>
+      row
+        .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+        .join(","),
+    )
+    .join("\n");
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `365-sport-report-${fromDate.value}-to-${toDate.value}.csv`;
+
+  link.click();
+
+  URL.revokeObjectURL(url);
+};
+
+// =====================================================
+// PDF
+// =====================================================
+
+const savePDF = () => {
+  window.print();
+};
+
+// =====================================================
+// REPORT TITLE
+// =====================================================
+
+const reportTitle = computed(() => {
+  if (selectedPeriod.value === "Custom") {
+    return `${fromDate.value} → ${toDate.value}`;
+  }
+
+  return selectedPeriod.value;
 });
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="min-h-screen space-y-6 bg-gray-50 p-1">
 
-    <div>
-      <h2 class="text-2xl font-bold">
-        Reports & Analytics
-      </h2>
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
 
-      <p class="text-sm text-gray-500">
-        Analyze your store performance
-      </p>
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">
+          Reports & Analytics
+        </h2>
+
+        <p class="mt-1 text-sm text-gray-500">
+          Analyze your store performance and sales activity.
+        </p>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+
+      <div class="flex flex-wrap gap-2">
+
+        <button
+          @click="refreshReport"
+          class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100"
+        >
+          <span :class="{ 'animate-spin': reportLoading }">
+            ↻
+          </span>
+
+          Refresh
+        </button>
+
+        <button
+          @click="printReport"
+          class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100"
+        >
+          🖨️
+          Print
+        </button>
+
+        <button
+          @click="savePDF"
+          class="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+        >
+          📄
+          Save PDF
+        </button>
+
+      </div>
     </div>
 
-    <!-- Revenue -->
-    <div class="grid gap-5 lg:grid-cols-3">
+    <!-- ================================================= -->
+    <!-- DATE FILTER -->
+    <!-- ================================================= -->
 
-      <div class="rounded-2xl border bg-white p-6">
-        <p class="text-sm text-gray-500">
-          Today's Sales
-        </p>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
 
-        <p class="mt-2 text-3xl font-bold">
-          $2,480
-        </p>
+      <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
 
-        <p class="mt-2 text-sm text-green-600">
-          +12.4%
-        </p>
+        <div>
+
+          <p class="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+            Report Period
+          </p>
+
+          <div class="flex flex-wrap gap-2">
+
+            <button
+              v-for="period in periods"
+              :key="period"
+              @click="
+                selectedPeriod = period;
+                changePeriod();
+              "
+              class="rounded-xl border px-4 py-2 text-sm font-medium transition"
+              :class="
+                selectedPeriod === period
+                  ? 'border-black bg-black text-white'
+                  : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-100'
+              "
+            >
+              {{ period }}
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- CUSTOM DATE -->
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-gray-500">
+              From
+            </label>
+
+            <input
+              v-model="fromDate"
+              type="date"
+              class="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-black"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-gray-500">
+              To
+            </label>
+
+            <input
+              v-model="toDate"
+              type="date"
+              class="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-black"
+            />
+          </div>
+
+        </div>
+
       </div>
 
-      <div class="rounded-2xl border bg-white p-6">
-        <p class="text-sm text-gray-500">
-          This Month
-        </p>
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
 
-        <p class="mt-2 text-3xl font-bold">
-          $24,580
-        </p>
+        <div class="text-sm text-gray-500">
+          Showing report for:
 
-        <p class="mt-2 text-sm text-green-600">
-          +18.2%
-        </p>
+          <span class="font-bold text-gray-900">
+            {{ reportTitle }}
+          </span>
+        </div>
+
+        <button
+          @click="exportCSV"
+          class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+        >
+          ⬇ Export CSV
+        </button>
+
       </div>
 
-      <div class="rounded-2xl border bg-white p-6">
-        <p class="text-sm text-gray-500">
+    </div>
+
+    <!-- ================================================= -->
+    <!-- KPI CARDS -->
+    <!-- ================================================= -->
+
+    <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+
+      <!-- Revenue -->
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+        <div class="flex items-center justify-between">
+
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 text-xl"
+          >
+            $
+          </div>
+
+          <span class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-bold text-green-600">
+            +{{ revenueGrowth }}%
+          </span>
+
+        </div>
+
+        <p class="mt-5 text-sm text-gray-500">
+          Total Revenue
+        </p>
+
+        <p class="mt-1 text-3xl font-bold text-gray-900">
+          {{ formatPrice(report.revenue) }}
+        </p>
+
+        <p class="mt-2 text-xs text-gray-400">
+          Previous: {{ formatPrice(report.previousRevenue) }}
+        </p>
+
+      </div>
+
+      <!-- Orders -->
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+        <div class="flex items-center justify-between">
+
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 text-xl"
+          >
+            🛒
+          </div>
+
+          <span class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-bold text-green-600">
+            +{{ ordersGrowth }}%
+          </span>
+
+        </div>
+
+        <p class="mt-5 text-sm text-gray-500">
+          Total Orders
+        </p>
+
+        <p class="mt-1 text-3xl font-bold">
+          {{ report.orders }}
+        </p>
+
+        <p class="mt-2 text-xs text-gray-400">
+          {{ report.cancelledOrders }} cancelled orders
+        </p>
+
+      </div>
+
+      <!-- Customers -->
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+        <div class="flex items-center justify-between">
+
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 text-xl"
+          >
+            👥
+          </div>
+
+          <span class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-bold text-green-600">
+            +{{ customersGrowth }}%
+          </span>
+
+        </div>
+
+        <p class="mt-5 text-sm text-gray-500">
+          Customers
+        </p>
+
+        <p class="mt-1 text-3xl font-bold">
+          {{ report.customers }}
+        </p>
+
+        <p class="mt-2 text-xs text-gray-400">
+          Active customers
+        </p>
+
+      </div>
+
+      <!-- Average Order -->
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+        <div class="flex items-center justify-between">
+
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 text-xl"
+          >
+            📦
+          </div>
+
+          <span class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-bold text-green-600">
+            +{{ averageOrderGrowth }}%
+          </span>
+
+        </div>
+
+        <p class="mt-5 text-sm text-gray-500">
           Average Order
         </p>
 
-        <p class="mt-2 text-3xl font-bold">
-          $87.50
+        <p class="mt-1 text-3xl font-bold">
+          {{ formatPrice(report.averageOrder) }}
         </p>
 
-        <p class="mt-2 text-sm text-green-600">
-          +5.7%
+        <p class="mt-2 text-xs text-gray-400">
+          Per completed order
         </p>
+
       </div>
 
     </div>
 
-    <!-- Sales Chart -->
-    <div class="rounded-2xl border bg-white p-6">
+    <!-- ================================================= -->
+    <!-- SALES CHART + ORDER STATUS -->
+    <!-- ================================================= -->
 
-      <h3 class="font-bold">
-        Sales Performance
-      </h3>
+    <div class="grid gap-6 xl:grid-cols-3">
 
-      <div class="mt-8 flex h-72 items-end gap-3">
+      <!-- SALES CHART -->
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm xl:col-span-2">
+
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+          <div>
+            <h3 class="font-bold text-gray-900">
+              Sales Performance
+            </h3>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Revenue generated over time
+            </p>
+          </div>
+
+          <div class="text-right">
+
+            <p class="text-xs text-gray-400">
+              Total
+            </p>
+
+            <p class="text-xl font-bold">
+              {{ formatPrice(report.revenue) }}
+            </p>
+
+          </div>
+
+        </div>
+
+        <!-- CHART -->
+
+        <div class="mt-8 flex h-72 items-end gap-2 overflow-x-auto sm:gap-3">
+
+          <div
+            v-for="item in salesData"
+            :key="item.month"
+            class="group flex h-full min-w-[35px] flex-1 flex-col justify-end"
+          >
+
+            <div class="relative flex h-full items-end">
+
+              <div
+                class="w-full rounded-t-lg bg-black transition-all duration-300 group-hover:bg-gray-600"
+                :style="{
+                  height: `${(item.revenue / maxRevenue) * 100}%`,
+                  minHeight: item.revenue ? '8px' : '0px',
+                }"
+              >
+
+                <div
+                  v-if="item.revenue"
+                  class="absolute -translate-y-7 whitespace-nowrap rounded bg-black px-2 py-1 text-[10px] text-white opacity-0 transition group-hover:opacity-100"
+                >
+                  {{ formatPrice(item.revenue) }}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="mt-3 text-center text-xs text-gray-400">
+              {{ item.month }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- CHART LEGEND -->
+
+        <div class="mt-5 flex items-center gap-6 border-t pt-4 text-xs text-gray-500">
+
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-black"></span>
+            Revenue
+          </div>
+
+          <div>
+            Orders:
+            <span class="font-bold text-gray-900">
+              {{ report.orders }}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ORDER STATUS -->
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+        <h3 class="font-bold">
+          Order Status
+        </h3>
+
+        <p class="mt-1 text-xs text-gray-400">
+          Current order distribution
+        </p>
+
+        <div class="mt-8 space-y-6">
+
+          <div
+            v-for="status in orderStatuses"
+            :key="status.name"
+          >
+
+            <div class="mb-2 flex justify-between text-sm">
+
+              <span class="font-medium text-gray-700">
+                {{ status.name }}
+              </span>
+
+              <span class="font-bold">
+                {{ status.count }}
+              </span>
+
+            </div>
+
+            <div class="h-2 overflow-hidden rounded-full bg-gray-100">
+
+              <div
+                class="h-full rounded-full bg-black transition-all"
+                :style="{ width: `${status.percentage}%` }"
+              ></div>
+
+            </div>
+
+            <p class="mt-1 text-right text-xs text-gray-400">
+              {{ status.percentage }}%
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- TOP PRODUCTS + TOP CUSTOMERS -->
+    <!-- ================================================= -->
+
+    <div class="grid gap-6 xl:grid-cols-2">
+
+      <!-- TOP PRODUCTS -->
+
+      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+        <div class="flex items-center justify-between border-b p-6">
+
+          <div>
+            <h3 class="font-bold">
+              Top Selling Products
+            </h3>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Best performing products
+            </p>
+          </div>
+
+          <span class="rounded-lg bg-gray-100 px-3 py-1 text-xs font-bold">
+            TOP 5
+          </span>
+
+        </div>
+
+        <div class="divide-y">
+
+          <div
+            v-for="(product, index) in topProducts"
+            :key="product.name"
+            class="flex items-center gap-4 p-5 transition hover:bg-gray-50"
+          >
+
+            <div
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black text-sm font-bold text-white"
+            >
+              {{ index + 1 }}
+            </div>
+
+            <div class="min-w-0 flex-1">
+
+              <p class="truncate text-sm font-bold text-gray-900">
+                {{ product.name }}
+              </p>
+
+              <p class="mt-1 text-xs text-gray-400">
+                {{ product.category }}
+              </p>
+
+            </div>
+
+            <div class="text-right">
+
+              <p class="text-sm font-bold">
+                {{ formatPrice(product.revenue) }}
+              </p>
+
+              <p class="mt-1 text-xs text-gray-400">
+                {{ product.sold }} sold
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TOP CUSTOMERS -->
+
+      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+        <div class="flex items-center justify-between border-b p-6">
+
+          <div>
+            <h3 class="font-bold">
+              Top Customers
+            </h3>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Customers with highest spending
+            </p>
+          </div>
+
+          <span class="rounded-lg bg-gray-100 px-3 py-1 text-xs font-bold">
+            TOP 5
+          </span>
+
+        </div>
+
+        <div class="divide-y">
+
+          <div
+            v-for="(customer, index) in topCustomers"
+            :key="customer.email"
+            class="flex items-center gap-4 p-5 transition hover:bg-gray-50"
+          >
+
+            <div
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold"
+            >
+              {{ customer.name.charAt(0) }}
+            </div>
+
+            <div class="min-w-0 flex-1">
+
+              <p class="truncate text-sm font-bold">
+                {{ customer.name }}
+              </p>
+
+              <p class="truncate text-xs text-gray-400">
+                {{ customer.email }}
+              </p>
+
+            </div>
+
+            <div class="text-right">
+
+              <p class="text-sm font-bold">
+                {{ formatPrice(customer.spent) }}
+              </p>
+
+              <p class="mt-1 text-xs text-gray-400">
+                {{ customer.orders }} orders
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- PAYMENT METHODS -->
+    <!-- ================================================= -->
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+      <div class="mb-6">
+
+        <h3 class="font-bold">
+          Payment Methods
+        </h3>
+
+        <p class="mt-1 text-xs text-gray-400">
+          Orders by payment method
+        </p>
+
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
         <div
-          v-for="height in [40,55,48,70,62,80,68,92,75,85,78,96]"
-          :key="height"
-          class="flex-1 rounded-t-lg bg-black transition hover:bg-gray-600"
-          :style="{ height: `${height}%` }"
-        ></div>
+          v-for="payment in paymentMethods"
+          :key="payment.name"
+          class="rounded-xl border border-gray-100 bg-gray-50 p-5"
+        >
 
-      </div>
+          <div class="flex items-center justify-between">
 
-      <div class="mt-3 flex justify-between text-xs text-gray-400">
-        <span>Jan</span>
-        <span>Feb</span>
-        <span>Mar</span>
-        <span>Apr</span>
-        <span>May</span>
-        <span>Jun</span>
-        <span>Jul</span>
-        <span>Aug</span>
-        <span>Sep</span>
-        <span>Oct</span>
-        <span>Nov</span>
-        <span>Dec</span>
+            <span class="text-sm font-semibold text-gray-700">
+              {{ payment.name }}
+            </span>
+
+            <span class="text-xs font-bold">
+              {{ payment.percentage }}%
+            </span>
+
+          </div>
+
+          <p class="mt-3 text-2xl font-bold">
+            {{ payment.orders }}
+          </p>
+
+          <p class="mt-1 text-xs text-gray-400">
+            Orders
+          </p>
+
+          <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-gray-200">
+
+            <div
+              class="h-full rounded-full bg-black"
+              :style="{ width: `${payment.percentage}%` }"
+            ></div>
+
+          </div>
+
+        </div>
+
       </div>
 
     </div>
 
-    <!-- Reports -->
-    <div class="grid gap-5 md:grid-cols-3">
+    <!-- ================================================= -->
+    <!-- SUMMARY -->
+    <!-- ================================================= -->
 
-      <button
-        class="rounded-2xl border bg-white p-6 text-left transition hover:-translate-y-1 hover:shadow-md"
-      >
-        <span class="text-3xl">📊</span>
+    <div class="rounded-2xl bg-black p-6 text-white shadow-sm">
 
-        <h3 class="mt-4 font-bold">
-          Sales Report
-        </h3>
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
-        <p class="mt-1 text-sm text-gray-500">
-          View detailed sales performance
-        </p>
-      </button>
+        <div>
 
-      <button
-        class="rounded-2xl border bg-white p-6 text-left transition hover:-translate-y-1 hover:shadow-md"
-      >
-        <span class="text-3xl">👟</span>
+          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Report Summary
+          </p>
 
-        <h3 class="mt-4 font-bold">
-          Product Report
-        </h3>
+          <h3 class="mt-2 text-xl font-bold">
+            {{ reportTitle }}
+          </h3>
 
-        <p class="mt-1 text-sm text-gray-500">
-          Find your best-selling products
-        </p>
-      </button>
+          <p class="mt-2 max-w-2xl text-sm text-gray-400">
+            Your store generated
+            <span class="font-bold text-white">
+              {{ formatPrice(report.revenue) }}
+            </span>
+            from
+            <span class="font-bold text-white">
+              {{ report.orders }}
+            </span>
+            orders during this reporting period.
+          </p>
 
-      <button
-        class="rounded-2xl border bg-white p-6 text-left transition hover:-translate-y-1 hover:shadow-md"
-      >
-        <span class="text-3xl">👥</span>
+        </div>
 
-        <h3 class="mt-4 font-bold">
-          Customer Report
-        </h3>
+        <div class="flex flex-wrap gap-3">
 
-        <p class="mt-1 text-sm text-gray-500">
-          Analyze customer activity
-        </p>
-      </button>
+          <button
+            @click="exportCSV"
+            class="rounded-xl border border-gray-700 px-4 py-2.5 text-sm font-semibold transition hover:bg-gray-800"
+          >
+            Export CSV
+          </button>
+
+          <button
+            @click="printReport"
+            class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-gray-200"
+          >
+            Print Report
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
   </div>
 </template>
+
+<style>
+@media print {
+  body {
+    background: white !important;
+  }
+
+  aside,
+  nav,
+  header {
+    display: none !important;
+  }
+
+  button {
+    display: none !important;
+  }
+
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  .bg-gray-50 {
+    background: white !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+}
+</style>
