@@ -147,11 +147,13 @@ const toggleStatus = (user: User) => {
         </p>
       </div>
 
-      <button
-        class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
-      >
-        + Add User
-      </button>
+      <NuxtLink
+  to="/admin/users/create"
+  class="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+>
+  <span class="text-lg">+</span>
+  Add User
+</NuxtLink>
 
     </div>
 

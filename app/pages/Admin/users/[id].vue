@@ -9,6 +9,10 @@ const route = useRoute();
 
 const userId = Number(route.params.id);
 
+// =====================================================
+// USER DATA
+// =====================================================
+
 const user = ref({
   id: userId,
   name: "Dara Sok",
@@ -24,6 +28,10 @@ const user = ref({
   cancelledOrders: 2,
   spent: 1250,
 });
+
+// =====================================================
+// ORDER DATA
+// =====================================================
 
 const orders = ref([
   {
@@ -56,42 +64,40 @@ const orders = ref([
   },
 ]);
 
+// =====================================================
+// ACTIVITY DATA
+// =====================================================
+
 const activities = [
   {
     title: "Placed an order",
     description: "Order #ORD-1001 was created.",
     date: "2 days ago",
+    icon: "🛒",
   },
   {
     title: "Updated profile",
     description: "User changed their phone number.",
     date: "5 days ago",
+    icon: "✏️",
   },
   {
     title: "Placed an order",
     description: "Order #ORD-1002 was created.",
     date: "14 days ago",
+    icon: "🛒",
+  },
+  {
+    title: "Created account",
+    description: "Customer account was created.",
+    date: "January 12, 2026",
+    icon: "👤",
   },
 ];
 
-const toggleStatus = () => {
-  user.value.status =
-    user.value.status === "Active" ? "Blocked" : "Active";
-};
-
-const deleteUser = () => {
-  const confirmed = confirm(
-    `Are you sure you want to delete ${user.value.name}?`
-  );
-
-  if (!confirmed) return;
-
-  navigateTo("/admin/users");
-};
-
-const editUser = () => {
-  alert("Edit user form will be connected here.");
-};
+// =====================================================
+// USER STATUS CLASS
+// =====================================================
 
 const statusClass = computed(() => {
   if (user.value.status === "Active") {
@@ -100,28 +106,123 @@ const statusClass = computed(() => {
 
   return "bg-red-100 text-red-700";
 });
+
+// =====================================================
+// TOGGLE USER STATUS
+// =====================================================
+
+const toggleStatus = () => {
+  user.value.status =
+    user.value.status === "Active"
+      ? "Blocked"
+      : "Active";
+};
+
+// =====================================================
+// EDIT USER
+// =====================================================
+
+const editUser = () => {
+  navigateTo(`/admin/users/${user.value.id}/edit`);
+};
+
+// =====================================================
+// DELETE USER
+// =====================================================
+
+const deleteUser = () => {
+  const confirmed = confirm(
+    `Are you sure you want to delete ${user.value.name}?`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  alert("User deleted successfully.");
+
+  navigateTo("/admin/users");
+};
+
+// =====================================================
+// ORDER STATUS CLASS
+// =====================================================
+
+const orderStatusClass = (status: string) => {
+  if (status === "Delivered") {
+    return "bg-green-100 text-green-700";
+  }
+
+  if (status === "Processing") {
+    return "bg-blue-100 text-blue-700";
+  }
+
+  if (status === "Pending") {
+    return "bg-yellow-100 text-yellow-700";
+  }
+
+  if (status === "Cancelled") {
+    return "bg-red-100 text-red-700";
+  }
+
+  return "bg-gray-100 text-gray-700";
+};
+
+// =====================================================
+// FORMAT PRICE
+// =====================================================
+
+const formatPrice = (price: number) => {
+  return price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
 
-    <!-- Header -->
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
     <div class="mb-8">
 
-      <div class="flex items-center gap-2 text-sm text-gray-500">
+      <!-- Back Button -->
+      <NuxtLink
+        to="/admin/users"
+        class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-100 hover:text-black"
+      >
+        <span class="text-lg leading-none">
+          ←
+        </span>
+
+        Back to Users
+      </NuxtLink>
+
+      <!-- Breadcrumb -->
+      <div class="mt-5 flex items-center gap-2 text-sm text-gray-500">
+
         <NuxtLink
           to="/admin/users"
-          class="hover:text-black"
+          class="transition hover:text-black"
         >
           Users
         </NuxtLink>
 
         <span>/</span>
 
-        <span>{{ user.name }}</span>
+        <span class="font-medium text-gray-700">
+          {{ user.name }}
+        </span>
+
       </div>
 
-      <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <!-- Page Title -->
+      <div
+        class="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
 
         <div>
           <h1 class="text-2xl font-bold text-gray-900">
@@ -129,22 +230,25 @@ const statusClass = computed(() => {
           </h1>
 
           <p class="mt-1 text-sm text-gray-500">
-            View customer information and activity.
+            View customer information, orders, and activity.
           </p>
         </div>
 
-        <div class="flex gap-3">
+        <!-- Header Actions -->
+        <div class="flex flex-wrap gap-3">
 
           <button
+            type="button"
+            class="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
             @click="editUser"
-            class="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold hover:bg-gray-100"
           >
             Edit User
           </button>
 
           <button
+            type="button"
+            class="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
             @click="deleteUser"
-            class="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
           >
             Delete
           </button>
@@ -152,33 +256,49 @@ const statusClass = computed(() => {
         </div>
 
       </div>
+
     </div>
 
-    <!-- Profile -->
+    <!-- ================================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ================================================= -->
+
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
 
-      <!-- Left -->
+      <!-- ================================================= -->
+      <!-- LEFT COLUMN -->
+      <!-- ================================================= -->
+
       <div class="space-y-6">
 
-        <div class="rounded-2xl border bg-white p-6 text-center shadow-sm">
+        <!-- Profile Card -->
+        <div
+          class="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm"
+        >
 
+          <!-- Avatar -->
           <img
             :src="user.avatar"
             :alt="user.name"
             class="mx-auto h-28 w-28 rounded-full object-cover ring-4 ring-gray-100"
           />
 
+          <!-- Name -->
           <h2 class="mt-5 text-xl font-bold text-gray-900">
             {{ user.name }}
           </h2>
 
-          <p class="mt-1 text-sm text-gray-500">
+          <!-- Email -->
+          <p class="mt-1 break-all text-sm text-gray-500">
             {{ user.email }}
           </p>
 
+          <!-- Role & Status -->
           <div class="mt-4 flex justify-center gap-2">
 
-            <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+            <span
+              class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
               {{ user.role }}
             </span>
 
@@ -191,17 +311,25 @@ const statusClass = computed(() => {
 
           </div>
 
+          <!-- Toggle Status -->
           <button
+            type="button"
+            class="mt-6 w-full rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
             @click="toggleStatus"
-            class="mt-6 w-full rounded-xl border border-gray-300 py-3 text-sm font-semibold hover:bg-gray-100"
           >
-            {{ user.status === "Active" ? "Block User" : "Activate User" }}
+            {{
+              user.status === "Active"
+                ? "Block User"
+                : "Activate User"
+            }}
           </button>
 
         </div>
 
-        <!-- Contact -->
-        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <!-- Contact Information -->
+        <div
+          class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
 
           <h3 class="font-bold text-gray-900">
             Contact Information
@@ -209,42 +337,46 @@ const statusClass = computed(() => {
 
           <div class="mt-5 space-y-5">
 
+            <!-- Email -->
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-400">
                 Email
               </p>
 
-              <p class="mt-1 text-sm font-medium">
+              <p class="mt-1 break-all text-sm font-medium text-gray-900">
                 {{ user.email }}
               </p>
             </div>
 
+            <!-- Phone -->
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-400">
                 Phone
               </p>
 
-              <p class="mt-1 text-sm font-medium">
+              <p class="mt-1 text-sm font-medium text-gray-900">
                 {{ user.phone }}
               </p>
             </div>
 
+            <!-- Address -->
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-400">
                 Address
               </p>
 
-              <p class="mt-1 text-sm font-medium">
+              <p class="mt-1 text-sm font-medium text-gray-900">
                 {{ user.address }}
               </p>
             </div>
 
+            <!-- Joined -->
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-400">
                 Joined
               </p>
 
-              <p class="mt-1 text-sm font-medium">
+              <p class="mt-1 text-sm font-medium text-gray-900">
                 {{ user.joined }}
               </p>
             </div>
@@ -255,23 +387,39 @@ const statusClass = computed(() => {
 
       </div>
 
-      <!-- Right -->
+      <!-- ================================================= -->
+      <!-- RIGHT COLUMN -->
+      <!-- ================================================= -->
+
       <div class="space-y-6 xl:col-span-2">
 
-        <!-- Statistics -->
+        <!-- ================================================= -->
+        <!-- STATISTICS -->
+        <!-- ================================================= -->
+
         <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
 
-          <div class="rounded-2xl border bg-white p-5 shadow-sm">
+          <!-- Total Orders -->
+          <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          >
             <p class="text-sm text-gray-500">
               Total Orders
             </p>
 
-            <p class="mt-2 text-2xl font-bold">
+            <p class="mt-2 text-2xl font-bold text-gray-900">
               {{ user.orders }}
+            </p>
+
+            <p class="mt-1 text-xs text-gray-400">
+              All orders
             </p>
           </div>
 
-          <div class="rounded-2xl border bg-white p-5 shadow-sm">
+          <!-- Completed -->
+          <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          >
             <p class="text-sm text-gray-500">
               Completed
             </p>
@@ -279,9 +427,16 @@ const statusClass = computed(() => {
             <p class="mt-2 text-2xl font-bold text-green-600">
               {{ user.completedOrders }}
             </p>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Successful orders
+            </p>
           </div>
 
-          <div class="rounded-2xl border bg-white p-5 shadow-sm">
+          <!-- Cancelled -->
+          <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          >
             <p class="text-sm text-gray-500">
               Cancelled
             </p>
@@ -289,27 +444,46 @@ const statusClass = computed(() => {
             <p class="mt-2 text-2xl font-bold text-red-600">
               {{ user.cancelledOrders }}
             </p>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Cancelled orders
+            </p>
           </div>
 
-          <div class="rounded-2xl border bg-white p-5 shadow-sm">
+          <!-- Total Spent -->
+          <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          >
             <p class="text-sm text-gray-500">
               Total Spent
             </p>
 
-            <p class="mt-2 text-2xl font-bold">
-              ${{ user.spent.toLocaleString() }}
+            <p class="mt-2 text-2xl font-bold text-gray-900">
+              ${{ formatPrice(user.spent) }}
+            </p>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Customer spending
             </p>
           </div>
 
         </div>
 
-        <!-- Orders -->
-        <div class="overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <!-- ================================================= -->
+        <!-- ORDER HISTORY -->
+        <!-- ================================================= -->
 
-          <div class="flex items-center justify-between border-b p-6">
+        <div
+          class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+        >
+
+          <!-- Order Header -->
+          <div
+            class="flex flex-col gap-3 border-b border-gray-100 p-6 sm:flex-row sm:items-center sm:justify-between"
+          >
 
             <div>
-              <h2 class="text-lg font-bold">
+              <h2 class="text-lg font-bold text-gray-900">
                 Order History
               </h2>
 
@@ -320,84 +494,118 @@ const statusClass = computed(() => {
 
             <NuxtLink
               to="/admin/orders"
-              class="text-sm font-semibold hover:underline"
+              class="text-sm font-semibold text-gray-700 transition hover:text-black hover:underline"
             >
               View All
             </NuxtLink>
 
           </div>
 
+          <!-- Table -->
           <div class="overflow-x-auto">
 
-            <table class="w-full min-w-[700px]">
+            <table class="w-full min-w-[800px] text-left">
 
               <thead class="bg-gray-50">
-                <tr class="border-b">
 
-                  <th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                <tr class="border-b border-gray-100">
+
+                  <th
+                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                  >
                     Order
                   </th>
 
-                  <th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  <th
+                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                  >
                     Date
                   </th>
 
-                  <th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  <th
+                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                  >
                     Items
                   </th>
 
-                  <th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  <th
+                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                  >
                     Total
                   </th>
 
-                  <th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  <th
+                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                  >
                     Status
                   </th>
 
+                  <th
+                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                  >
+                    Action
+                  </th>
+
                 </tr>
+
               </thead>
 
-              <tbody class="divide-y">
+              <tbody class="divide-y divide-gray-100">
 
                 <tr
                   v-for="order in orders"
                   :key="order.id"
-                  class="hover:bg-gray-50"
+                  class="transition hover:bg-gray-50"
                 >
 
-                  <td class="px-6 py-4 text-sm font-semibold">
-                    {{ order.id }}
+                  <!-- Order -->
+                  <td class="px-6 py-4">
+
+                    <NuxtLink
+                      :to="`/admin/orders/${order.id.replace('#ORD-', '')}`"
+                      class="text-sm font-semibold text-gray-900 hover:underline"
+                    >
+                      {{ order.id }}
+                    </NuxtLink>
+
                   </td>
 
+                  <!-- Date -->
                   <td class="px-6 py-4 text-sm text-gray-500">
                     {{ order.date }}
                   </td>
 
-                  <td class="px-6 py-4 text-sm">
+                  <!-- Items -->
+                  <td class="px-6 py-4 text-sm text-gray-700">
                     {{ order.items }}
                   </td>
 
-                  <td class="px-6 py-4 text-sm font-semibold">
-                    ${{ order.total }}
+                  <!-- Total -->
+                  <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                    ${{ formatPrice(order.total) }}
                   </td>
 
+                  <!-- Status -->
                   <td class="px-6 py-4">
 
                     <span
                       class="rounded-full px-3 py-1 text-xs font-semibold"
-                      :class="{
-                        'bg-green-100 text-green-700':
-                          order.status === 'Delivered',
-
-                        'bg-yellow-100 text-yellow-700':
-                          order.status === 'Processing',
-
-                        'bg-red-100 text-red-700':
-                          order.status === 'Cancelled',
-                      }"
+                      :class="orderStatusClass(order.status)"
                     >
                       {{ order.status }}
                     </span>
+
+                  </td>
+
+                  <!-- Action -->
+                  <td class="px-6 py-4">
+
+                    <NuxtLink
+                      :to="`/admin/orders/${order.id.replace('#ORD-', '')}`"
+                      class="text-sm font-semibold text-gray-700 hover:text-black hover:underline"
+                    >
+                      View
+                    </NuxtLink>
 
                   </td>
 
@@ -409,32 +617,76 @@ const statusClass = computed(() => {
 
           </div>
 
+          <!-- Empty State -->
+          <div
+            v-if="orders.length === 0"
+            class="p-10 text-center"
+          >
+
+            <div class="text-4xl">
+              🛒
+            </div>
+
+            <h3 class="mt-3 font-semibold text-gray-900">
+              No orders yet
+            </h3>
+
+            <p class="mt-1 text-sm text-gray-500">
+              This customer hasn't placed any orders.
+            </p>
+
+          </div>
+
         </div>
 
-        <!-- Activity -->
-        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <!-- ================================================= -->
+        <!-- RECENT ACTIVITY -->
+        <!-- ================================================= -->
 
-          <h2 class="text-lg font-bold">
-            Recent Activity
-          </h2>
+        <div
+          class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
 
-          <div class="mt-6 space-y-6">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">
+              Recent Activity
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-500">
+              Recent activity from this customer.
+            </p>
+          </div>
+
+          <!-- Activity -->
+          <div class="mt-6">
 
             <div
-              v-for="activity in activities"
+              v-for="(activity, index) in activities"
               :key="activity.title + activity.date"
-              class="flex gap-4"
+              class="relative flex gap-4 pb-6 last:pb-0"
             >
 
-              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100">
-                ✓
+              <!-- Timeline Line -->
+              <div
+                v-if="index !== activities.length - 1"
+                class="absolute left-5 top-10 h-full w-px bg-gray-200"
+              ></div>
+
+              <!-- Icon -->
+              <div
+                class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-lg"
+              >
+                {{ activity.icon }}
               </div>
 
-              <div class="flex-1">
+              <!-- Activity Content -->
+              <div class="min-w-0 flex-1">
 
-                <div class="flex flex-col justify-between gap-1 sm:flex-row">
+                <div
+                  class="flex flex-col justify-between gap-1 sm:flex-row"
+                >
 
-                  <p class="font-semibold">
+                  <p class="font-semibold text-gray-900">
                     {{ activity.title }}
                   </p>
 
