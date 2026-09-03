@@ -77,12 +77,13 @@ const deleteBrand = (id: number) => {
         </p>
       </div>
 
-      <button
+      <NuxtLink
+        to="/admin/brands/create"
         class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white"
         @click="showModal = true"
       >
         + Add Brand
-      </button>
+      </NuxtLink>
 
     </div>
 

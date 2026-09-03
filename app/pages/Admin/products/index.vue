@@ -55,11 +55,12 @@ const deleteProduct = (id: number) => {
         </p>
       </div>
 
-      <button
+      <NuxtLink
+        to="/admin/products/create"
         class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
       >
         + Add Product
-      </button>
+      </NuxtLink>
 
     </div>
 
