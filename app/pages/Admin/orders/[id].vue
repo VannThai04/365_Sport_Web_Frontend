@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { products } from "~/data/product";
 
 definePageMeta({
   layout: "admin"
@@ -8,408 +7,705 @@ definePageMeta({
 
 const route = useRoute();
 
-const productId = computed(() => {
-  return Number(route.params.id);
+const orderId = computed(() => {
+  return String(route.params.id);
 });
 
-const product = computed(() => {
-  return products.find(item => item.id === productId.value);
-});
+/* =========================
+   ORDER DATA
+========================= */
 
-const form = ref({
-  name: "",
-  price: 0,
-  category: "",
-  brand: "",
-  gender: "",
-  color: "",
-  description: "",
+const order = ref({
+  id: `#ORD-${orderId.value}`,
+  customer: "Dara Sok",
+  email: "dara@example.com",
+  phone: "+855 12 345 678",
+
+  product: "Nike Mercurial Vapor 16 Elite",
+  productImage:
+    "https://images.unsplash.com/photo-1553778263-73a83bab9b0c",
+
+  quantity: 1,
+  size: "42",
+  color: "Black / Red",
+
+  price: 145.97,
+  subtotal: 145.97,
+  shipping: 6,
   discount: 0,
-  stock: 0,
-  image: "",
-  hoverimg: "",
-  featured: false,
-  isNew: false,
-  sizes: [] as string[]
+  total: 151.97,
+
+  status: "Completed",
+  paymentStatus: "Paid",
+  paymentMethod: "ABA Pay",
+
+  shippingAddress:
+    "123 Street 271, Sangkat Toul Tompoung, Phnom Penh, Cambodia",
+
+  orderDate: "Sep 03, 2026",
+  updatedDate: "Sep 03, 2026"
 });
 
-const initialized = ref(false);
+/* =========================
+   FORM
+========================= */
 
-watch(
-  product,
-  (value) => {
+const selectedStatus = ref(order.value.status);
+const selectedPaymentStatus = ref(order.value.paymentStatus);
 
-    if (!value || initialized.value) return;
+const showDeleteModal = ref(false);
+const showSuccess = ref(false);
 
-    form.value = {
-      name: value.name,
-      price: value.price,
-      category: value.category,
-      brand: value.brand,
-      gender: value.gender,
-      color: value.color,
-      description: value.description,
-      discount: value.discount,
-      stock: value.stock,
-      image: value.image,
-      hoverimg: value.hoverimg,
-      featured: value.featured,
-      isNew: value.isNew,
-      sizes: [...value.size]
-    };
+/* =========================
+   STATUS
+========================= */
 
-    initialized.value = true;
-  },
-  { immediate: true }
-);
+const statusClass = computed(() => {
+  switch (selectedStatus.value) {
+    case "Pending":
+      return "bg-yellow-100 text-yellow-700";
 
-const availableSizes = [
-  "S",
-  "M",
-  "L",
-  "XL",
-  "XXL",
-  "39",
-  "40",
-  "41",
-  "42",
-  "42.5",
-  "43",
-  "44",
-  "45"
-];
+    case "Processing":
+      return "bg-blue-100 text-blue-700";
 
-const toggleSize = (size: string) => {
-  if (form.value.sizes.includes(size)) {
-    form.value.sizes = form.value.sizes.filter(
-      item => item !== size
-    );
-  } else {
-    form.value.sizes.push(size);
+    case "Completed":
+      return "bg-green-100 text-green-700";
+
+    case "Cancelled":
+      return "bg-red-100 text-red-700";
+
+    default:
+      return "bg-gray-100 text-gray-700";
   }
-};
+});
 
-const updateProduct = () => {
-  console.log("Updated product:", {
-    id: productId.value,
-    ...form.value
-  });
+const paymentClass = computed(() => {
+  switch (selectedPaymentStatus.value) {
+    case "Paid":
+      return "bg-green-100 text-green-700";
 
-  alert("Product updated successfully!");
+    case "Pending":
+      return "bg-yellow-100 text-yellow-700";
 
-  navigateTo("/admin/products");
-};
+    case "Refunded":
+      return "bg-red-100 text-red-700";
 
-const deleteProduct = () => {
-  if (!product.value) return;
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+});
 
-  const confirmed = confirm(
-    `Delete "${product.value.name}"?`
+/* =========================
+   UPDATE ORDER
+========================= */
+
+const updateOrder = () => {
+  order.value.status = selectedStatus.value;
+  order.value.paymentStatus = selectedPaymentStatus.value;
+
+  order.value.updatedDate = new Date().toLocaleDateString(
+    "en-US",
+    {
+      month: "short",
+      day: "2-digit",
+      year: "numeric"
+    }
   );
 
-  if (!confirmed) return;
+  showSuccess.value = true;
 
-  alert("Product deleted successfully!");
+  setTimeout(() => {
+    showSuccess.value = false;
+  }, 3000);
+};
 
-  navigateTo("/admin/products");
+/* =========================
+   DELETE
+========================= */
+
+const deleteOrder = () => {
+  showDeleteModal.value = false;
+
+  alert(`Order ${order.value.id} deleted successfully!`);
+
+  navigateTo("/admin/orders");
+});
+
+/* =========================
+   PRINT
+========================= */
+
+const printOrder = () => {
+  window.print();
+};
+
+/* =========================
+   PRICE
+========================= */
+
+const formatPrice = (price: number) => {
+  return `$${price.toFixed(2)}`;
 };
 </script>
 
 <template>
-  <div v-if="product" class="mx-auto max-w-6xl space-y-6">
+  <div class="mx-auto max-w-7xl space-y-6">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
 
       <div>
 
         <NuxtLink
-          to="/admin/products"
+          to="/admin/orders"
           class="text-sm font-medium text-gray-500 hover:text-black"
         >
-          ← Back to Products
+          ← Back to Orders
         </NuxtLink>
 
-        <h2 class="mt-2 text-2xl font-bold">
-          Edit Product
-        </h2>
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+
+          <h1 class="text-2xl font-bold">
+            Order {{ order.id }}
+          </h1>
+
+          <span
+            class="rounded-full px-3 py-1 text-xs font-semibold"
+            :class="statusClass"
+          >
+            {{ selectedStatus }}
+          </span>
+
+        </div>
 
         <p class="mt-1 text-sm text-gray-500">
-          Product ID: #{{ product.id }}
+          Placed on {{ order.orderDate }}
         </p>
 
       </div>
 
-      <div class="flex gap-3">
+      <div class="flex flex-wrap gap-3">
 
         <button
-          class="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
-          @click="deleteProduct"
+          type="button"
+          class="rounded-xl border bg-white px-5 py-3 text-sm font-semibold hover:bg-gray-50"
+          @click="printOrder"
         >
-          Delete
+          🖨 Print
         </button>
 
         <button
-          class="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
-          @click="updateProduct"
+          type="button"
+          class="rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+          @click="showDeleteModal = true"
         >
-          Save Changes
+          Delete
         </button>
 
       </div>
 
     </div>
 
+    <!-- SUCCESS MESSAGE -->
+    <div
+      v-if="showSuccess"
+      class="rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm font-medium text-green-700"
+    >
+      ✓ Order updated successfully.
+    </div>
+
     <div class="grid gap-6 lg:grid-cols-3">
 
-      <!-- Main -->
+      <!-- LEFT -->
       <div class="space-y-6 lg:col-span-2">
 
-        <!-- Information -->
-        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <!-- ORDER ITEMS -->
+        <div class="rounded-2xl border bg-white shadow-sm">
 
-          <h3 class="font-bold">
-            Product Information
-          </h3>
+          <div class="border-b px-6 py-5">
+            <h2 class="font-bold">
+              Order Items
+            </h2>
 
-          <div class="mt-6 space-y-5">
+            <p class="mt-1 text-xs text-gray-500">
+              Products purchased in this order.
+            </p>
+          </div>
 
-            <div>
-              <label class="mb-2 block text-sm font-semibold">
-                Product Name
-              </label>
+          <div class="p-6">
 
-              <input
-                v-model="form.name"
-                class="w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
-              />
-            </div>
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
 
-            <div>
-              <label class="mb-2 block text-sm font-semibold">
-                Description
-              </label>
-
-              <textarea
-                v-model="form.description"
-                rows="5"
-                class="w-full resize-none rounded-xl border px-4 py-3 outline-none focus:border-black"
-              ></textarea>
-            </div>
-
-            <div class="grid gap-5 sm:grid-cols-2">
-
-              <div>
-                <label class="mb-2 block text-sm font-semibold">
-                  Brand
-                </label>
-
-                <select
-                  v-model="form.brand"
-                  class="w-full rounded-xl border px-4 py-3 outline-none"
-                >
-                  <option>Nike</option>
-                  <option>Adidas</option>
-                  <option>Puma</option>
-                  <option>Mizuno</option>
-                  <option>New Balance</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="mb-2 block text-sm font-semibold">
-                  Category
-                </label>
-
-                <select
-                  v-model="form.category"
-                  class="w-full rounded-xl border px-4 py-3 outline-none"
-                >
-                  <option>Football Boots</option>
-                  <option>Football Jersey</option>
-                  <option>Football Clothing</option>
-                  <option>Football Bags</option>
-                  <option>Football Accessories</option>
-                  <option>Football</option>
-                  <option>Goalkeeper</option>
-                </select>
-              </div>
-
-            </div>
-
-            <div class="grid gap-5 sm:grid-cols-2">
-
-              <div>
-                <label class="mb-2 block text-sm font-semibold">
-                  Gender
-                </label>
-
-                <select
-                  v-model="form.gender"
-                  class="w-full rounded-xl border px-4 py-3 outline-none"
-                >
-                  <option>Men</option>
-                  <option>Women</option>
-                  <option>Unisex</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="mb-2 block text-sm font-semibold">
-                  Color
-                </label>
-
-                <input
-                  v-model="form.color"
-                  class="w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
+              <!-- IMAGE -->
+              <div
+                class="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100"
+              >
+                <img
+                  :src="order.productImage"
+                  :alt="order.product"
+                  class="h-full w-full object-contain"
                 />
               </div>
 
+              <!-- PRODUCT -->
+              <div class="flex-1">
+
+                <p class="text-lg font-bold">
+                  {{ order.product }}
+                </p>
+
+                <div class="mt-2 flex flex-wrap gap-2">
+
+                  <span class="rounded-lg bg-gray-100 px-3 py-1 text-xs">
+                    Size: {{ order.size }}
+                  </span>
+
+                  <span class="rounded-lg bg-gray-100 px-3 py-1 text-xs">
+                    Color: {{ order.color }}
+                  </span>
+
+                </div>
+
+                <p class="mt-3 text-sm text-gray-500">
+                  Quantity: {{ order.quantity }}
+                </p>
+
+              </div>
+
+              <!-- PRICE -->
+              <div class="text-left sm:text-right">
+
+                <p class="text-lg font-bold">
+                  {{ formatPrice(order.price) }}
+                </p>
+
+                <p class="text-xs text-gray-500">
+                  × {{ order.quantity }}
+                </p>
+
+              </div>
+
             </div>
 
           </div>
 
         </div>
 
-        <!-- Pricing -->
-        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <!-- CUSTOMER -->
+        <div class="grid gap-6 md:grid-cols-2">
 
-          <h3 class="font-bold">
-            Pricing & Inventory
-          </h3>
+          <!-- CUSTOMER INFORMATION -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <div class="mt-6 grid gap-5 sm:grid-cols-3">
+            <h2 class="font-bold">
+              Customer Information
+            </h2>
 
-            <div>
-              <label class="mb-2 block text-sm font-semibold">
-                Price
-              </label>
+            <div class="mt-5 space-y-4">
 
-              <input
-                v-model="form.price"
-                type="number"
-                class="w-full rounded-xl border px-4 py-3 outline-none"
-              />
+              <div>
+                <p class="text-xs text-gray-500">
+                  Name
+                </p>
+
+                <p class="mt-1 font-semibold">
+                  {{ order.customer }}
+                </p>
+              </div>
+
+              <div>
+                <p class="text-xs text-gray-500">
+                  Email
+                </p>
+
+                <p class="mt-1 font-medium">
+                  {{ order.email }}
+                </p>
+              </div>
+
+              <div>
+                <p class="text-xs text-gray-500">
+                  Phone
+                </p>
+
+                <p class="mt-1 font-medium">
+                  {{ order.phone }}
+                </p>
+              </div>
+
             </div>
 
-            <div>
-              <label class="mb-2 block text-sm font-semibold">
-                Discount
-              </label>
+          </div>
 
-              <input
-                v-model="form.discount"
-                type="number"
-                class="w-full rounded-xl border px-4 py-3 outline-none"
-              />
-            </div>
+          <!-- SHIPPING -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm">
 
-            <div>
-              <label class="mb-2 block text-sm font-semibold">
-                Stock
-              </label>
+            <h2 class="font-bold">
+              Shipping Address
+            </h2>
 
-              <input
-                v-model="form.stock"
-                type="number"
-                class="w-full rounded-xl border px-4 py-3 outline-none"
-              />
+            <div class="mt-5">
+
+              <div class="flex gap-3">
+
+                <div class="text-xl">
+                  📍
+                </div>
+
+                <p class="text-sm leading-6 text-gray-600">
+                  {{ order.shippingAddress }}
+                </p>
+
+              </div>
+
             </div>
 
           </div>
 
         </div>
 
-        <!-- Sizes -->
+        <!-- ORDER TIMELINE -->
         <div class="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <h3 class="font-bold">
-            Available Sizes
-          </h3>
+          <h2 class="font-bold">
+            Order Timeline
+          </h2>
 
-          <div class="mt-5 flex flex-wrap gap-3">
+          <div class="mt-6 space-y-6">
+
+            <!-- Completed -->
+            <div class="flex gap-4">
+
+              <div class="flex flex-col items-center">
+
+                <div
+                  class="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-green-600"
+                >
+                  ✓
+                </div>
+
+                <div class="mt-2 h-10 w-px bg-gray-200"></div>
+
+              </div>
+
+              <div>
+                <p class="font-semibold">
+                  Order Completed
+                </p>
+
+                <p class="mt-1 text-sm text-gray-500">
+                  Order has been successfully completed.
+                </p>
+
+                <p class="mt-1 text-xs text-gray-400">
+                  {{ order.updatedDate }}
+                </p>
+              </div>
+
+            </div>
+
+            <!-- Processing -->
+            <div class="flex gap-4">
+
+              <div class="flex flex-col items-center">
+
+                <div
+                  class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-600"
+                >
+                  🚚
+                </div>
+
+                <div class="mt-2 h-10 w-px bg-gray-200"></div>
+
+              </div>
+
+              <div>
+                <p class="font-semibold">
+                  Processing
+                </p>
+
+                <p class="mt-1 text-sm text-gray-500">
+                  Order was prepared for delivery.
+                </p>
+
+              </div>
+
+            </div>
+
+            <!-- Paid -->
+            <div class="flex gap-4">
+
+              <div
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-green-600"
+              >
+                $
+              </div>
+
+              <div>
+                <p class="font-semibold">
+                  Payment Received
+                </p>
+
+                <p class="mt-1 text-sm text-gray-500">
+                  Payment method:
+                  {{ order.paymentMethod }}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="space-y-6">
+
+        <!-- UPDATE STATUS -->
+        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+
+          <h2 class="font-bold">
+            Update Order
+          </h2>
+
+          <div class="mt-5 space-y-5">
+
+            <!-- STATUS -->
+            <div>
+
+              <label class="mb-2 block text-sm font-semibold">
+                Order Status
+              </label>
+
+              <select
+                v-model="selectedStatus"
+                class="w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
+              >
+                <option>Pending</option>
+                <option>Processing</option>
+                <option>Completed</option>
+                <option>Cancelled</option>
+              </select>
+
+            </div>
+
+            <!-- PAYMENT -->
+            <div>
+
+              <label class="mb-2 block text-sm font-semibold">
+                Payment Status
+              </label>
+
+              <select
+                v-model="selectedPaymentStatus"
+                class="w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
+              >
+                <option>Paid</option>
+                <option>Pending</option>
+                <option>Refunded</option>
+              </select>
+
+            </div>
 
             <button
-              v-for="size in availableSizes"
-              :key="size"
               type="button"
-              class="rounded-lg border px-4 py-2 text-sm font-semibold"
-              :class="
-                form.sizes.includes(size)
-                  ? 'border-black bg-black text-white'
-                  : 'border-gray-200'
-              "
-              @click="toggleSize(size)"
+              class="w-full rounded-xl bg-black px-5 py-3 font-semibold text-white transition hover:bg-gray-800"
+              @click="updateOrder"
             >
-              {{ size }}
+              Save Changes
             </button>
 
           </div>
 
         </div>
 
-      </div>
-
-      <!-- Sidebar -->
-      <div class="space-y-6">
-
+        <!-- PAYMENT -->
         <div class="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <h3 class="font-bold">
-            Product Image
-          </h3>
+          <h2 class="font-bold">
+            Payment Information
+          </h2>
 
-          <input
-            v-model="form.image"
-            class="mt-5 w-full rounded-xl border px-4 py-3 text-sm outline-none"
-            placeholder="Image URL"
-          />
+          <div class="mt-5 space-y-4">
 
-          <div class="mt-5 flex h-64 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">
+                Status
+              </span>
 
-            <img
-              :src="form.image"
-              :alt="form.name"
-              class="h-full w-full object-contain"
-            />
+              <span
+                class="rounded-full px-3 py-1 text-xs font-semibold"
+                :class="paymentClass"
+              >
+                {{ selectedPaymentStatus }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">
+                Method
+              </span>
+
+              <span class="text-sm font-semibold">
+                {{ order.paymentMethod }}
+              </span>
+            </div>
 
           </div>
 
         </div>
 
+        <!-- ORDER SUMMARY -->
         <div class="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <h3 class="font-bold">
-            Status
-          </h3>
+          <h2 class="font-bold">
+            Order Summary
+          </h2>
 
-          <label class="mt-5 flex items-center justify-between">
+          <div class="mt-5 space-y-4 text-sm">
 
-            <span class="text-sm">
-              Featured
-            </span>
+            <div class="flex justify-between">
+              <span class="text-gray-500">
+                Subtotal
+              </span>
 
-            <input
-              v-model="form.featured"
-              type="checkbox"
-              class="h-5 w-5 accent-black"
-            />
+              <span class="font-medium">
+                {{ formatPrice(order.subtotal) }}
+              </span>
+            </div>
 
-          </label>
+            <div class="flex justify-between">
+              <span class="text-gray-500">
+                Shipping
+              </span>
 
-          <label class="mt-4 flex items-center justify-between">
+              <span class="font-medium">
+                {{ formatPrice(order.shipping) }}
+              </span>
+            </div>
 
-            <span class="text-sm">
-              New Product
-            </span>
+            <div class="flex justify-between">
+              <span class="text-gray-500">
+                Discount
+              </span>
 
-            <input
-              v-model="form.isNew"
-              type="checkbox"
-              class="h-5 w-5 accent-black"
-            />
+              <span class="font-medium text-green-600">
+                -{{ formatPrice(order.discount) }}
+              </span>
+            </div>
 
-          </label>
+            <div class="border-t pt-4">
+
+              <div class="flex justify-between">
+
+                <span class="font-bold">
+                  Total
+                </span>
+
+                <span class="text-xl font-bold">
+                  {{ formatPrice(order.total) }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ORDER INFO -->
+        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+
+          <h2 class="font-bold">
+            Order Information
+          </h2>
+
+          <div class="mt-5 space-y-4">
+
+            <div>
+              <p class="text-xs text-gray-500">
+                Order ID
+              </p>
+
+              <p class="mt-1 font-semibold">
+                {{ order.id }}
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-gray-500">
+                Created
+              </p>
+
+              <p class="mt-1 font-medium">
+                {{ order.orderDate }}
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-gray-500">
+                Last Updated
+              </p>
+
+              <p class="mt-1 font-medium">
+                {{ order.updatedDate }}
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      @click.self="showDeleteModal = false"
+    >
+
+      <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+          ⚠️
+        </div>
+
+        <h2 class="mt-4 text-xl font-bold">
+          Delete Order?
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-gray-500">
+          Are you sure you want to delete
+          <span class="font-semibold text-gray-900">
+            {{ order.id }}
+          </span>?
+          This action cannot be undone.
+        </p>
+
+        <div class="mt-6 flex justify-end gap-3">
+
+          <button
+            type="button"
+            class="rounded-xl border px-5 py-3 text-sm font-semibold hover:bg-gray-50"
+            @click="showDeleteModal = false"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700"
+            @click="deleteOrder"
+          >
+            Delete Order
+          </button>
 
         </div>
 
@@ -418,35 +714,24 @@ const deleteProduct = () => {
     </div>
 
   </div>
-
-  <!-- Not Found -->
-  <div
-    v-else
-    class="flex min-h-[500px] items-center justify-center"
-  >
-
-    <div class="text-center">
-
-      <div class="text-6xl">
-        😕
-      </div>
-
-      <h2 class="mt-4 text-2xl font-bold">
-        Product Not Found
-      </h2>
-
-      <p class="mt-2 text-gray-500">
-        The product you're looking for doesn't exist.
-      </p>
-
-      <NuxtLink
-        to="/admin/products"
-        class="mt-5 inline-block rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white"
-      >
-        Back to Products
-      </NuxtLink>
-
-    </div>
-
-  </div>
 </template>
+
+<style>
+@media print {
+  header,
+  nav,
+  aside,
+  button,
+  a {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .space-y-6 {
+    margin: 0 !important;
+  }
+}
+</style>

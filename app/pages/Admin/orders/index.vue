@@ -1,173 +1,611 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 
 definePageMeta({
   layout: "admin"
 });
 
-const search = ref("");
-const status = ref("All");
+type OrderStatus =
+  | "Pending"
+  | "Processing"
+  | "Completed"
+  | "Cancelled";
 
-const orders = ref([
+type PaymentStatus =
+  | "Paid"
+  | "Pending"
+  | "Refunded";
+
+interface Order {
+  id: string;
+  customer: string;
+  email: string;
+  phone: string;
+  product: string;
+  quantity: number;
+  subtotal: number;
+  shipping: number;
+  total: number;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethod: string;
+  date: string;
+}
+
+const orders = ref<Order[]>([
   {
     id: "#ORD-1001",
     customer: "Dara Sok",
     email: "dara@example.com",
+    phone: "+855 12 345 678",
     product: "Nike Mercurial Vapor 16",
     quantity: 1,
+    subtotal: 145.97,
+    shipping: 6,
     total: 151.97,
     status: "Completed",
+    paymentStatus: "Paid",
+    paymentMethod: "ABA Pay",
     date: "Sep 03, 2026"
   },
   {
     id: "#ORD-1002",
     customer: "Vann Thai",
     email: "vann@example.com",
+    phone: "+855 96 555 1234",
     product: "Adidas Predator Elite",
     quantity: 1,
+    subtotal: 260,
+    shipping: 0,
     total: 260,
     status: "Processing",
+    paymentStatus: "Paid",
+    paymentMethod: "Credit Card",
     date: "Sep 03, 2026"
   },
   {
     id: "#ORD-1003",
     customer: "Seyha Chan",
     email: "seyha@example.com",
+    phone: "+855 97 222 4567",
     product: "PUMA Future 8 Ultimate",
     quantity: 2,
+    subtotal: 217.98,
+    shipping: 10,
     total: 227.98,
     status: "Pending",
+    paymentStatus: "Pending",
+    paymentMethod: "Cash on Delivery",
     date: "Sep 02, 2026"
   },
   {
     id: "#ORD-1004",
     customer: "Sokha Kim",
     email: "sokha@example.com",
+    phone: "+855 11 888 999",
     product: "Nike Phantom GX 2",
     quantity: 1,
+    subtotal: 220,
+    shipping: 0,
     total: 220,
     status: "Cancelled",
+    paymentStatus: "Refunded",
+    paymentMethod: "Wing",
     date: "Sep 01, 2026"
+  },
+  {
+    id: "#ORD-1005",
+    customer: "Rithy Chea",
+    email: "rithy@example.com",
+    phone: "+855 10 444 555",
+    product: "Mizuno Morelia Neo IV JAPAN",
+    quantity: 1,
+    subtotal: 285,
+    shipping: 8,
+    total: 293,
+    status: "Completed",
+    paymentStatus: "Paid",
+    paymentMethod: "ABA Pay",
+    date: "Aug 31, 2026"
+  },
+  {
+    id: "#ORD-1006",
+    customer: "Sokun Vibol",
+    email: "sokun@example.com",
+    phone: "+855 15 333 222",
+    product: "Nike Tiempo Legend 10 Elite",
+    quantity: 1,
+    subtotal: 280,
+    shipping: 0,
+    total: 280,
+    status: "Processing",
+    paymentStatus: "Paid",
+    paymentMethod: "Credit Card",
+    date: "Aug 30, 2026"
+  },
+  {
+    id: "#ORD-1007",
+    customer: "Kanha Ly",
+    email: "kanha@example.com",
+    phone: "+855 88 777 666",
+    product: "Adidas Copa Pure 2 Elite",
+    quantity: 2,
+    subtotal: 310,
+    shipping: 10,
+    total: 320,
+    status: "Pending",
+    paymentStatus: "Pending",
+    paymentMethod: "Cash on Delivery",
+    date: "Aug 29, 2026"
   }
 ]);
 
-const filteredOrders = computed(() => {
-  return orders.value.filter(order => {
+const search = ref("");
+const selectedStatus = ref("All");
+const selectedPayment = ref("All");
+const selectedSort = ref("Newest");
 
+const showDeleteModal = ref(false);
+const selectedOrder = ref<Order | null>(null);
+
+/* =========================
+   STATISTICS
+========================= */
+
+const totalOrders = computed(() => orders.value.length);
+
+const totalRevenue = computed(() =>
+  orders.value
+    .filter(order => order.status !== "Cancelled")
+    .reduce((sum, order) => sum + order.total, 0)
+);
+
+const pendingOrders = computed(() =>
+  orders.value.filter(order => order.status === "Pending").length
+);
+
+const processingOrders = computed(() =>
+  orders.value.filter(order => order.status === "Processing").length
+);
+
+const completedOrders = computed(() =>
+  orders.value.filter(order => order.status === "Completed").length
+);
+
+const cancelledOrders = computed(() =>
+  orders.value.filter(order => order.status === "Cancelled").length
+);
+
+const paidOrders = computed(() =>
+  orders.value.filter(order => order.paymentStatus === "Paid").length
+);
+
+/* =========================
+   FILTER
+========================= */
+
+const filteredOrders = computed(() => {
+  const keyword = search.value.toLowerCase().trim();
+
+  let result = orders.value.filter(order => {
     const matchSearch =
-      order.id.toLowerCase().includes(search.value.toLowerCase()) ||
-      order.customer.toLowerCase().includes(search.value.toLowerCase());
+      !keyword ||
+      order.id.toLowerCase().includes(keyword) ||
+      order.customer.toLowerCase().includes(keyword) ||
+      order.email.toLowerCase().includes(keyword) ||
+      order.product.toLowerCase().includes(keyword);
 
     const matchStatus =
-      status.value === "All" ||
-      order.status === status.value;
+      selectedStatus.value === "All" ||
+      order.status === selectedStatus.value;
 
-    return matchSearch && matchStatus;
+    const matchPayment =
+      selectedPayment.value === "All" ||
+      order.paymentStatus === selectedPayment.value;
+
+    return matchSearch && matchStatus && matchPayment;
   });
+
+  if (selectedSort.value === "Newest") {
+    result = [...result].sort((a, b) => b.id.localeCompare(a.id));
+  }
+
+  if (selectedSort.value === "Oldest") {
+    result = [...result].sort((a, b) => a.id.localeCompare(b.id));
+  }
+
+  if (selectedSort.value === "Highest Amount") {
+    result = [...result].sort((a, b) => b.total - a.total);
+  }
+
+  if (selectedSort.value === "Lowest Amount") {
+    result = [...result].sort((a, b) => a.total - b.total);
+  }
+
+  if (selectedSort.value === "Customer A-Z") {
+    result = [...result].sort((a, b) =>
+      a.customer.localeCompare(b.customer)
+    );
+  }
+
+  return result;
 });
+
+/* =========================
+   HELPERS
+========================= */
+
+const statusClass = (status: OrderStatus) => {
+  return {
+    "bg-yellow-100 text-yellow-700": status === "Pending",
+    "bg-blue-100 text-blue-700": status === "Processing",
+    "bg-green-100 text-green-700": status === "Completed",
+    "bg-red-100 text-red-700": status === "Cancelled"
+  };
+};
+
+const paymentClass = (status: PaymentStatus) => {
+  return {
+    "bg-green-100 text-green-700": status === "Paid",
+    "bg-yellow-100 text-yellow-700": status === "Pending",
+    "bg-red-100 text-red-700": status === "Refunded"
+  };
+};
+
+const formatPrice = (price: number) => {
+  return `$${price.toFixed(2)}`;
+};
+
+const clearFilters = () => {
+  search.value = "";
+  selectedStatus.value = "All";
+  selectedPayment.value = "All";
+  selectedSort.value = "Newest";
+};
+
+/* =========================
+   DELETE
+========================= */
+
+const openDeleteModal = (order: Order) => {
+  selectedOrder.value = order;
+  showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+  selectedOrder.value = null;
+  showDeleteModal.value = false;
+};
+
+const deleteOrder = () => {
+  if (!selectedOrder.value) return;
+
+  orders.value = orders.value.filter(
+    order => order.id !== selectedOrder.value?.id
+  );
+
+  closeDeleteModal();
+};
 </script>
 
 <template>
   <div class="space-y-6">
 
-    <!-- Header -->
-    <div>
-      <h2 class="text-2xl font-bold">
-        Orders
-      </h2>
+    <!-- HEADER -->
+    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">
+          Orders
+        </h1>
 
-      <p class="text-sm text-gray-500">
-        Manage customer orders and payments
-      </p>
+        <p class="mt-1 text-sm text-gray-500">
+          Manage customer orders, payments and order status.
+        </p>
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          class="rounded-xl border bg-white px-4 py-3 text-sm font-semibold hover:bg-gray-50"
+          @click="clearFilters"
+        >
+          Reset Filters
+        </button>
+      </div>
     </div>
 
-    <!-- Stats -->
+    <!-- MAIN STATS -->
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+      <div class="rounded-2xl border bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">
+            Total Orders
+          </p>
+
+          <div class="rounded-xl bg-gray-100 p-3">
+            📦
+          </div>
+        </div>
+
+        <p class="mt-4 text-3xl font-bold">
+          {{ totalOrders }}
+        </p>
+
+        <p class="mt-1 text-xs text-gray-500">
+          All orders
+        </p>
+      </div>
+
+      <div class="rounded-2xl border bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">
+            Revenue
+          </p>
+
+          <div class="rounded-xl bg-green-100 p-3">
+            💰
+          </div>
+        </div>
+
+        <p class="mt-4 text-3xl font-bold text-green-600">
+          {{ formatPrice(totalRevenue) }}
+        </p>
+
+        <p class="mt-1 text-xs text-gray-500">
+          Excluding cancelled orders
+        </p>
+      </div>
+
+      <div class="rounded-2xl border bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">
+            Pending
+          </p>
+
+          <div class="rounded-xl bg-yellow-100 p-3">
+            ⏳
+          </div>
+        </div>
+
+        <p class="mt-4 text-3xl font-bold text-yellow-600">
+          {{ pendingOrders }}
+        </p>
+
+        <p class="mt-1 text-xs text-gray-500">
+          Waiting for confirmation
+        </p>
+      </div>
+
+      <div class="rounded-2xl border bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">
+            Completed
+          </p>
+
+          <div class="rounded-xl bg-green-100 p-3">
+            ✓
+          </div>
+        </div>
+
+        <p class="mt-4 text-3xl font-bold text-green-600">
+          {{ completedOrders }}
+        </p>
+
+        <p class="mt-1 text-xs text-gray-500">
+          Successfully delivered
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ORDER STATUS SUMMARY -->
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
       <div class="rounded-2xl border bg-white p-5">
-        <p class="text-sm text-gray-500">
-          Total Orders
-        </p>
+        <div class="flex items-center gap-3">
+          <span class="h-3 w-3 rounded-full bg-yellow-500"></span>
 
-        <p class="mt-2 text-2xl font-bold">
-          1,248
-        </p>
-      </div>
+          <span class="text-sm font-medium text-gray-600">
+            Pending
+          </span>
+        </div>
 
-      <div class="rounded-2xl border bg-white p-5">
-        <p class="text-sm text-gray-500">
-          Pending
-        </p>
-
-        <p class="mt-2 text-2xl font-bold text-yellow-600">
-          18
+        <p class="mt-3 text-2xl font-bold">
+          {{ pendingOrders }}
         </p>
       </div>
 
       <div class="rounded-2xl border bg-white p-5">
-        <p class="text-sm text-gray-500">
-          Processing
-        </p>
+        <div class="flex items-center gap-3">
+          <span class="h-3 w-3 rounded-full bg-blue-500"></span>
 
-        <p class="mt-2 text-2xl font-bold text-blue-600">
-          26
+          <span class="text-sm font-medium text-gray-600">
+            Processing
+          </span>
+        </div>
+
+        <p class="mt-3 text-2xl font-bold">
+          {{ processingOrders }}
         </p>
       </div>
 
       <div class="rounded-2xl border bg-white p-5">
-        <p class="text-sm text-gray-500">
-          Completed
-        </p>
+        <div class="flex items-center gap-3">
+          <span class="h-3 w-3 rounded-full bg-green-500"></span>
 
-        <p class="mt-2 text-2xl font-bold text-green-600">
-          1,184
+          <span class="text-sm font-medium text-gray-600">
+            Completed
+          </span>
+        </div>
+
+        <p class="mt-3 text-2xl font-bold">
+          {{ completedOrders }}
+        </p>
+      </div>
+
+      <div class="rounded-2xl border bg-white p-5">
+        <div class="flex items-center gap-3">
+          <span class="h-3 w-3 rounded-full bg-red-500"></span>
+
+          <span class="text-sm font-medium text-gray-600">
+            Cancelled
+          </span>
+        </div>
+
+        <p class="mt-3 text-2xl font-bold">
+          {{ cancelledOrders }}
         </p>
       </div>
 
     </div>
 
-    <!-- Filters -->
-    <div class="flex flex-col gap-4 rounded-2xl border bg-white p-5 md:flex-row">
+    <!-- FILTERS -->
+    <div class="rounded-2xl border bg-white p-5 shadow-sm">
 
-      <input
-        v-model="search"
-        placeholder="Search order or customer..."
-        class="flex-1 rounded-xl border px-4 py-3 outline-none focus:border-black"
-      />
+      <div class="grid gap-4 lg:grid-cols-4">
 
-      <select
-        v-model="status"
-        class="rounded-xl border px-4 py-3 outline-none"
-      >
-        <option>All</option>
-        <option>Pending</option>
-        <option>Processing</option>
-        <option>Completed</option>
-        <option>Cancelled</option>
-      </select>
+        <!-- Search -->
+        <div class="lg:col-span-2">
+          <label class="mb-2 block text-sm font-semibold">
+            Search
+          </label>
+
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              🔍
+            </span>
+
+            <input
+              v-model="search"
+              type="text"
+              placeholder="Order ID, customer, email or product..."
+              class="w-full rounded-xl border py-3 pl-11 pr-4 outline-none transition focus:border-black"
+            />
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold">
+            Order Status
+          </label>
+
+          <select
+            v-model="selectedStatus"
+            class="w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
+          >
+            <option>All</option>
+            <option>Pending</option>
+            <option>Processing</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+          </select>
+        </div>
+
+        <!-- Payment -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold">
+            Payment
+          </label>
+
+          <select
+            v-model="selectedPayment"
+            class="w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
+          >
+            <option>All</option>
+            <option>Paid</option>
+            <option>Pending</option>
+            <option>Refunded</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+
+        <p class="text-sm text-gray-500">
+          Showing
+          <span class="font-semibold text-gray-900">
+            {{ filteredOrders.length }}
+          </span>
+          orders
+        </p>
+
+        <select
+          v-model="selectedSort"
+          class="rounded-xl border px-4 py-2.5 text-sm outline-none"
+        >
+          <option>Newest</option>
+          <option>Oldest</option>
+          <option>Highest Amount</option>
+          <option>Lowest Amount</option>
+          <option>Customer A-Z</option>
+        </select>
+
+      </div>
 
     </div>
 
-    <!-- Table -->
-    <div class="overflow-hidden rounded-2xl border bg-white">
+    <!-- TABLE -->
+    <div class="overflow-hidden rounded-2xl border bg-white shadow-sm">
+
+      <div class="border-b px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-bold">
+              Order List
+            </h2>
+
+            <p class="mt-1 text-xs text-gray-500">
+              View and manage customer purchases.
+            </p>
+          </div>
+
+          <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold">
+            {{ filteredOrders.length }} Orders
+          </span>
+        </div>
+      </div>
 
       <div class="overflow-x-auto">
 
-        <table class="w-full text-left text-sm">
+        <table class="w-full min-w-[1100px] text-left text-sm">
 
           <thead class="bg-gray-50 text-xs uppercase text-gray-500">
-
             <tr>
-              <th class="px-6 py-4">Order</th>
-              <th class="px-6 py-4">Customer</th>
-              <th class="px-6 py-4">Product</th>
-              <th class="px-6 py-4">Quantity</th>
-              <th class="px-6 py-4">Total</th>
-              <th class="px-6 py-4">Status</th>
-              <th class="px-6 py-4">Date</th>
-              <th class="px-6 py-4">Action</th>
-            </tr>
+              <th class="px-6 py-4">
+                Order
+              </th>
 
+              <th class="px-6 py-4">
+                Customer
+              </th>
+
+              <th class="px-6 py-4">
+                Product
+              </th>
+
+              <th class="px-6 py-4">
+                Total
+              </th>
+
+              <th class="px-6 py-4">
+                Payment
+              </th>
+
+              <th class="px-6 py-4">
+                Status
+              </th>
+
+              <th class="px-6 py-4">
+                Date
+              </th>
+
+              <th class="px-6 py-4">
+                Action
+              </th>
+            </tr>
           </thead>
 
           <tbody class="divide-y">
@@ -175,15 +613,25 @@ const filteredOrders = computed(() => {
             <tr
               v-for="order in filteredOrders"
               :key="order.id"
-              class="hover:bg-gray-50"
+              class="transition hover:bg-gray-50"
             >
 
-              <td class="px-6 py-5 font-bold">
-                {{ order.id }}
+              <!-- Order -->
+              <td class="px-6 py-5">
+                <NuxtLink
+                  :to="`/admin/orders/${order.id.replace('#ORD-', '')}`"
+                  class="font-bold hover:underline"
+                >
+                  {{ order.id }}
+                </NuxtLink>
+
+                <p class="mt-1 text-xs text-gray-400">
+                  {{ order.quantity }} item<span v-if="order.quantity > 1">s</span>
+                </p>
               </td>
 
+              <!-- Customer -->
               <td class="px-6 py-5">
-
                 <p class="font-semibold">
                   {{ order.customer }}
                 </p>
@@ -192,55 +640,83 @@ const filteredOrders = computed(() => {
                   {{ order.email }}
                 </p>
 
+                <p class="text-xs text-gray-400">
+                  {{ order.phone }}
+                </p>
               </td>
 
+              <!-- Product -->
+              <td class="max-w-[230px] px-6 py-5">
+                <p class="truncate font-medium">
+                  {{ order.product }}
+                </p>
+
+                <p class="mt-1 text-xs text-gray-500">
+                  Qty: {{ order.quantity }}
+                </p>
+              </td>
+
+              <!-- Total -->
               <td class="px-6 py-5">
-                {{ order.product }}
+                <p class="font-bold">
+                  {{ formatPrice(order.total) }}
+                </p>
+
+                <p class="text-xs text-gray-400">
+                  Shipping: {{ formatPrice(order.shipping) }}
+                </p>
               </td>
 
+              <!-- Payment -->
               <td class="px-6 py-5">
-                {{ order.quantity }}
-              </td>
-
-              <td class="px-6 py-5 font-bold">
-                ${{ order.total.toFixed(2) }}
-              </td>
-
-              <td class="px-6 py-5">
-
                 <span
                   class="rounded-full px-3 py-1 text-xs font-semibold"
-                  :class="{
-                    'bg-yellow-100 text-yellow-700':
-                      order.status === 'Pending',
+                  :class="paymentClass(order.paymentStatus)"
+                >
+                  {{ order.paymentStatus }}
+                </span>
 
-                    'bg-blue-100 text-blue-700':
-                      order.status === 'Processing',
+                <p class="mt-2 text-xs text-gray-500">
+                  {{ order.paymentMethod }}
+                </p>
+              </td>
 
-                    'bg-green-100 text-green-700':
-                      order.status === 'Completed',
-
-                    'bg-red-100 text-red-700':
-                      order.status === 'Cancelled'
-                  }"
+              <!-- Status -->
+              <td class="px-6 py-5">
+                <span
+                  class="rounded-full px-3 py-1 text-xs font-semibold"
+                  :class="statusClass(order.status)"
                 >
                   {{ order.status }}
                 </span>
-
               </td>
 
+              <!-- Date -->
               <td class="whitespace-nowrap px-6 py-5 text-gray-500">
                 {{ order.date }}
               </td>
 
+              <!-- Action -->
               <td class="px-6 py-5">
 
-                <NuxtLink
-                  :to="`/admin/orders/${order.id.replace('#ORD-', '')}`"
-                  class="rounded-lg bg-gray-100 px-3 py-2 text-xs font-semibold hover:bg-black hover:text-white"
-                >
-                  View
-                </NuxtLink>
+                <div class="flex items-center gap-2">
+
+                  <NuxtLink
+                    :to="`/admin/orders/${order.id.replace('#ORD-', '')}`"
+                    class="rounded-lg bg-gray-100 px-3 py-2 text-xs font-semibold transition hover:bg-black hover:text-white"
+                  >
+                    View
+                  </NuxtLink>
+
+                  <button
+                    type="button"
+                    class="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100"
+                    @click="openDeleteModal(order)"
+                  >
+                    Delete
+                  </button>
+
+                </div>
 
               </td>
 
@@ -249,6 +725,81 @@ const filteredOrders = computed(() => {
           </tbody>
 
         </table>
+
+      </div>
+
+      <!-- EMPTY -->
+      <div
+        v-if="filteredOrders.length === 0"
+        class="px-6 py-20 text-center"
+      >
+        <div class="text-5xl">
+          📦
+        </div>
+
+        <h3 class="mt-4 text-lg font-bold">
+          No orders found
+        </h3>
+
+        <p class="mt-2 text-sm text-gray-500">
+          Try changing your search or filters.
+        </p>
+
+        <button
+          type="button"
+          class="mt-5 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white"
+          @click="clearFilters"
+        >
+          Clear Filters
+        </button>
+      </div>
+
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      @click.self="closeDeleteModal"
+    >
+
+      <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl">
+          ⚠️
+        </div>
+
+        <h2 class="mt-4 text-xl font-bold">
+          Delete Order?
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-gray-500">
+          Are you sure you want to delete
+          <span class="font-semibold text-gray-900">
+            {{ selectedOrder?.id }}
+          </span>?
+          This action cannot be undone.
+        </p>
+
+        <div class="mt-6 flex justify-end gap-3">
+
+          <button
+            type="button"
+            class="rounded-xl border px-5 py-3 text-sm font-semibold hover:bg-gray-50"
+            @click="closeDeleteModal"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700"
+            @click="deleteOrder"
+          >
+            Delete Order
+          </button>
+
+        </div>
 
       </div>
 
