@@ -74,7 +74,7 @@ const categories = [
   <!-- ================================================= -->
 
   <div
-    class="flex w-full gap-6 overflow-x-auto pb-4"
+    class="flex w-full gap-6 overflow-x-auto pb-4 py-4 px-4"
     style="
       scrollbar-width: none;
       -ms-overflow-style: none;

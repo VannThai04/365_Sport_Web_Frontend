@@ -141,43 +141,19 @@ const clearFilters = () => {
 </script>
 
 <template>
-<<<<<<< HEAD
-  <div class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-4">
-    <ProductCard
-      v-for="product in products"
-      :key="product.id"
-      :product="product"
-    />
-=======
   <div class="min-h-screen bg-gray-100 px-5 py-6">
-    <!-- ================================================= -->
-    <!-- CATEGORY -->
-    <!-- ================================================= -->
-
     <div class="bg-gray-100">
-      <!-- FULL WIDTH CATEGORIES -->
-
       <Categories
         :selected-category="selectedCategory"
         @select="selectedCategory = $event"
       />
 
-      <!-- PRODUCT CONTENT -->
-
-      <div class="px-5 py-6">
-        <!-- Search -->
-      </div>
+      <div class="px-5 py-6"></div>
     </div>
-
-    <!-- ================================================= -->
-    <!-- SEARCH HEADER -->
-    <!-- ================================================= -->
 
     <div
       class="mb-6 flex h-21.25 w-full items-center rounded-2xl border border-gray-200 bg-white px-5 shadow-sm"
     >
-      <!-- SEARCH -->
-
       <div class="relative flex-1">
         <input
           v-model="search"
@@ -191,46 +167,28 @@ const clearFilters = () => {
         </span>
       </div>
 
-      <!-- SORT -->
-
       <select
         v-model="sortBy"
         class="ml-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500"
       >
         <option value="featured">Featured</option>
-
         <option value="low">Price: Low to High</option>
-
         <option value="high">Price: High to Low</option>
-
         <option value="name">Name</option>
       </select>
     </div>
 
-    <!-- ================================================= -->
-    <!-- MAIN -->
-    <!-- ================================================= -->
-
     <div class="flex w-full gap-6">
-      <!-- ================================================= -->
-      <!-- SIDEBAR -->
-      <!-- ================================================= -->
-
-      <aside class="hidden lg:block w-72 shrink-0">
+      <aside class="hidden w-72 shrink-0 lg:block">
         <div
           class="sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
           style="scrollbar-width: thin"
         >
-          <!-- ============================================= -->
-          <!-- FILTER HEADER -->
-          <!-- ============================================= -->
-
           <div
             class="flex items-center justify-between border-b border-gray-100 pb-5"
           >
             <div>
               <h2 class="text-xl font-bold text-gray-900">Filters</h2>
-
               <p class="mt-1 text-xs text-gray-500">Refine your products</p>
             </div>
 
@@ -242,10 +200,6 @@ const clearFilters = () => {
               Clear
             </button>
           </div>
-
-          <!-- ============================================= -->
-          <!-- PRODUCT TYPE -->
-          <!-- ============================================= -->
 
           <div class="mt-6">
             <h3
@@ -274,12 +228,8 @@ const clearFilters = () => {
                   />
 
                   <span v-if="type === 'Popular'"> 🔥 </span>
-
                   <span v-if="type === 'Discount'"> 🏷️ </span>
-
-                  <span>
-                    {{ type }}
-                  </span>
+                  <span>{{ type }}</span>
                 </div>
 
                 <span v-if="selectedType === type" class="text-blue-600">
@@ -288,10 +238,6 @@ const clearFilters = () => {
               </label>
             </div>
           </div>
-
-          <!-- ============================================= -->
-          <!-- CATEGORY -->
-          <!-- ============================================= -->
 
           <div class="mt-7 border-t border-gray-100 pt-6">
             <h3
@@ -319,9 +265,7 @@ const clearFilters = () => {
                     class="h-4 w-4 accent-blue-600"
                   />
 
-                  <span>
-                    {{ category }}
-                  </span>
+                  <span>{{ category }}</span>
                 </div>
 
                 <span
@@ -333,10 +277,6 @@ const clearFilters = () => {
               </label>
             </div>
           </div>
-
-          <!-- ============================================= -->
-          <!-- BRAND -->
-          <!-- ============================================= -->
 
           <div class="mt-7 border-t border-gray-100 pt-6">
             <h3
@@ -364,9 +304,7 @@ const clearFilters = () => {
                     class="h-4 w-4 accent-blue-600"
                   />
 
-                  <span>
-                    {{ brand }}
-                  </span>
+                  <span>{{ brand }}</span>
                 </div>
 
                 <span
@@ -378,10 +316,6 @@ const clearFilters = () => {
               </label>
             </div>
           </div>
-
-          <!-- ============================================= -->
-          <!-- GENDER -->
-          <!-- ============================================= -->
 
           <div class="mt-7 border-t border-gray-100 pt-6">
             <h3
@@ -409,9 +343,7 @@ const clearFilters = () => {
                     class="h-4 w-4 accent-blue-600"
                   />
 
-                  <span>
-                    {{ gender }}
-                  </span>
+                  <span>{{ gender }}</span>
                 </div>
 
                 <span
@@ -423,10 +355,6 @@ const clearFilters = () => {
               </label>
             </div>
           </div>
-
-          <!-- ============================================= -->
-          <!-- PRICE -->
-          <!-- ============================================= -->
 
           <div class="mt-7 border-t border-gray-100 pt-6">
             <h3
@@ -472,10 +400,6 @@ const clearFilters = () => {
             </div>
           </div>
 
-          <!-- ============================================= -->
-          <!-- RESET BUTTON -->
-          <!-- ============================================= -->
-
           <button
             type="button"
             @click="clearFilters"
@@ -486,13 +410,7 @@ const clearFilters = () => {
         </div>
       </aside>
 
-      <!-- ================================================= -->
-      <!-- PRODUCT AREA -->
-      <!-- ================================================= -->
-
       <main class="min-w-0 flex-1">
-        <!-- PRODUCT HEADER -->
-
         <div class="mb-6 flex items-center justify-between">
           <div>
             <h1 class="text-2xl font-bold text-gray-900">
@@ -507,10 +425,6 @@ const clearFilters = () => {
           </div>
         </div>
 
-        <!-- ================================================= -->
-        <!-- PRODUCT GRID -->
-        <!-- ================================================= -->
-
         <div
           v-if="filteredProducts.length"
           class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
@@ -521,10 +435,6 @@ const clearFilters = () => {
             :product="product"
           />
         </div>
-
-        <!-- ================================================= -->
-        <!-- NO PRODUCTS -->
-        <!-- ================================================= -->
 
         <div
           v-else
@@ -551,6 +461,5 @@ const clearFilters = () => {
         </div>
       </main>
     </div>
->>>>>>> 5122ed19357ad99144e6253845c95327c81f47f1
   </div>
 </template>
