@@ -24,7 +24,7 @@
 
     <button
       @click.stop="toggleWishlist(product)"
-      class="absolute bottom-71.25 right-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition hover:scale-110"
+      class="absolute right-3 top-14 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition hover:scale-110"
       title="Wishlist"
     >
       <span
@@ -38,21 +38,17 @@
     <!-- Image -->
 
     <NuxtLink
-  :to="`/Product/${product.id}`"
-  class="block h-64 w-full overflow-hidden bg-gray-100"
-  @mouseenter="isHovered = true"
-  @mouseleave="isHovered = false"
->
-  <img
-    :src="
-      isHovered && product.hoverimg
-        ? product.hoverimg
-        : product.image
-    "
-    :alt="product.name"
-    class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-  />
-</NuxtLink>
+      :to="`/Product/${product.id}`"
+      class="block h-64 w-full overflow-hidden bg-gray-100"
+      @mouseenter="isHovered = true"
+      @mouseleave="isHovered = false"
+    >
+      <img
+        :src="isHovered && product.hoverimg ? product.hoverimg : product.image"
+        :alt="product.name"
+        class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      />
+    </NuxtLink>
 
     <!-- Information -->
 
@@ -144,7 +140,7 @@
 
         <button
           :disabled="product.stock === 0"
-          @click="addToCart"
+          @click="goToProductDetail"
           class="flex-1 rounded-xl bg-black px-4 py-3 font-semibold text-white transition duration-300 hover:-translate-y-1 hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           🔍 View Details
@@ -154,7 +150,7 @@
 
         <button
           :disabled="product.stock === 0"
-          @click="buyNow"
+          @click="goToProductDetail"
           class="rounded-xl border border-gray-200 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Buy
