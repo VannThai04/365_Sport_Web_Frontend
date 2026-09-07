@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
+
 // ===============================================
 // Wishlist
 // ===============================================
@@ -10,6 +12,9 @@ const { wishlistCount } = useWishlist();
 // ===============================================
 
 const { cartCount } = useCart();
+const { user, loadUser, logout } = useAuth();
+
+onMounted(loadUser);
 </script>
 
 <template>
@@ -150,10 +155,36 @@ const { cartCount } = useCart();
           </NuxtLink>
 
           <!-- ================================= -->
-          <!-- Login -->
+          <!-- Account -->
           <!-- ================================= -->
 
+          <template v-if="user">
+            <NuxtLink
+              to="/Profile"
+              class="flex items-center gap-2 rounded-lg bg-black px-3 py-2 text-white transition duration-300 hover:bg-amber-500 hover:text-black"
+              title="View profile"
+            >
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-full bg-lime-400 text-sm font-bold text-black"
+              >
+                {{ user.name.charAt(0).toUpperCase() }}
+              </span>
+              <span class="max-w-28 truncate text-sm font-medium">
+                {{ user.name }}
+              </span>
+            </NuxtLink>
+
+            <button
+              type="button"
+              class="text-sm font-medium text-gray-600 transition hover:text-black"
+              @click="logout"
+            >
+              Logout
+            </button>
+          </template>
+
           <NuxtLink
+            v-else
             to="/Auth/Login"
             class="rounded-lg bg-black px-5 py-2 font-medium text-white transition duration-300 hover:bg-amber-500 hover:text-black"
           >
