@@ -7,7 +7,6 @@ interface CartItem {
   quantity: number;
   size: string;
 }
-
 export const useCart = () => {
   const cart = useState<CartItem[]>("cart", () => []);
 
